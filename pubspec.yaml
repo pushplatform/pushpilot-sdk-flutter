@@ -1,0 +1,29 @@
+name: push_platform_flutter
+description: Flutter SDK for Push Platform - thin wrapper over native iOS/Android SDKs
+version: 0.1.0
+homepage: https://pushplatform.example
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  mockito: ^5.4.0
+  build_runner: ^2.4.0
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: FlutterPushPlatformPlugin
+      android:
+        package: com.pushplatform.flutter
+        pluginClass: FlutterPushPlatformPlugin
