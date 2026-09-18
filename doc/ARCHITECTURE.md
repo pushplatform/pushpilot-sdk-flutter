@@ -24,10 +24,11 @@ The Push Platform Flutter SDK is a **thin wrapper** over native iOS and Android 
 
 - ✅ Raw device tokens NEVER cross platform channel boundary
 - ✅ Token prefixes/hashes NEVER exposed to Dart
-- ✅ API keys NEVER hardcoded in Dart code
-- ✅ All credentials stored in native secure storage only
+- ✅ Client API keys (`devices:write` scope) passed through Dart for initialization
+- ✅ Server API keys (`messages:send` scope) NEVER embedded in app
+- ✅ All tokens and internal credentials stored in native secure storage only
 
-**Why**: Dart code is easy to decompile and inspect. Sensitive data must stay in native layer where it's protected by OS-level security (Keychain on iOS, EncryptedSharedPreferences on Android).
+**Why**: Dart code is easy to decompile and inspect. Raw device tokens and server credentials must stay in native layer where they're protected by OS-level security (Keychain on iOS, EncryptedSharedPreferences on Android). Client API keys with limited `devices:write` scope are passed through Dart for initialization, consistent with ADR-0012, ADR-0013, ADR-0014.
 
 ### 3. Platform-Specific Logic Stays Native
 

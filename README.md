@@ -22,7 +22,7 @@ This SDK is a **thin wrapper** over the native iOS and Android SDKs. All busines
 3. Event stream controllers
 4. Serialization/deserialization between Dart ↔ Native
 
-**Security**: Raw device tokens, API keys, and credentials are NEVER exposed to Dart. All sensitive data is handled exclusively by the native SDKs.
+**Security**: Raw device tokens and server credentials are NEVER exposed to Dart. All sensitive data is handled exclusively by the native SDKs. Client API keys (`devices:write` scope) are passed through Dart for initialization, consistent with standard mobile SDK patterns.
 
 ## Installation
 
@@ -659,9 +659,10 @@ void main() {
 ## Security
 
 - ✅ Raw device tokens NEVER exposed to Dart
-- ✅ API keys NEVER exposed to Dart
+- ✅ Client API keys (`devices:write` scope) passed through Dart for initialization
+- ✅ Server API keys (`messages:send` scope) NEVER embedded in app
 - ✅ Token prefixes/hashes NEVER exposed to Dart
-- ✅ All credentials handled by native SDK
+- ✅ All tokens and internal credentials handled by native SDK
 - ✅ Keychain storage (iOS), EncryptedSharedPreferences (Android)
 
 ## Retry and Deduplication

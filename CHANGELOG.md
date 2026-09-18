@@ -43,8 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Android: Runtime permission handling for Android 13+
 - Comprehensive error handling with standardized error codes
 - Security features:
-  - NO raw device tokens exposed to Dart layer
-  - NO API keys or credentials in Dart code
+  - APNs device tokens NEVER exposed to Dart
+  - FCM device tokens NEVER exposed to Dart
+  - Token prefixes/hashes NEVER exposed to Dart
+  - Client API keys (`devices:write` scope) passed through Dart for initialization
+  - Server API keys (`messages:send` scope) NEVER embedded in app
   - Token management delegated to native SDKs
 - Thin wrapper architecture:
   - All business logic in native iOS/Android SDKs
@@ -95,8 +98,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - APNs device tokens NEVER exposed to Dart
 - FCM device tokens NEVER exposed to Dart
 - Token prefixes/hashes NEVER exposed to Dart
-- API keys NEVER hardcoded in Dart code
-- All credentials handled by native SDKs only
+- Client API keys (`devices:write` scope) passed through Dart for initialization
+- Server API keys (`messages:send` scope) NEVER embedded in app
+- All tokens and internal credentials handled by native SDKs only
 - PlatformException messages sanitized (no token leaks)
 
 ### Testing Notes
