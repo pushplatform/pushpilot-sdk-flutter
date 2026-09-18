@@ -312,7 +312,8 @@ void main() {
           apiKey: 'test-key',
           environment: 'production',
         );
-        final loginFuture = sdk.login(userId: 'user-123').catchError((e) => null);
+        final loginFuture =
+            sdk.login(userId: 'user-123').catchError((e) => null);
 
         await initFuture; // Wait for init
         final loginResult = await loginFuture; // Wait for login
@@ -328,14 +329,16 @@ void main() {
 
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockStreamHandler(pushChannel,
-                MockStreamHandler.inline(onListen: (_, __) {
-          throw PlatformException(code: 'STREAM_ERROR', message: 'Push error');
+                MockStreamHandler.inline(onListen: (_, sink) {
+          sink.error(code: 'STREAM_ERROR', message: 'Push error');
+          return null;
         }));
 
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockStreamHandler(stateChannel,
-                MockStreamHandler.inline(onListen: (_, __) {
-          return null; // State stream works fine
+                MockStreamHandler.inline(onListen: (_, sink) {
+          sink.success('initialized');
+          return null;
         }));
 
         expect(
@@ -343,10 +346,8 @@ void main() {
           throwsA(isA<PlatformException>()),
         );
 
-        expect(
-          () => sdk.onStateChange.listen((_) {}),
-          returnsNormally,
-        );
+        final state = await sdk.onStateChange.first;
+        expect(state, StateChange.initialized);
       });
     });
   });

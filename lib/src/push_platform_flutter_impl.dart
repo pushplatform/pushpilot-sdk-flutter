@@ -21,13 +21,9 @@ class PushPlatformFlutter {
   static const MethodChannel _methodChannel =
       MethodChannel('com.pushplatform/sdk');
 
-  // Event channels for push/VoIP/call/state events
+  // Event channels for push/state events
   static const EventChannel _pushEventChannel =
       EventChannel('com.pushplatform/push_events');
-  static const EventChannel _voipEventChannel =
-      EventChannel('com.pushplatform/voip_events');
-  static const EventChannel _callEventChannel =
-      EventChannel('com.pushplatform/call_events');
   static const EventChannel _stateEventChannel =
       EventChannel('com.pushplatform/state_events');
 

@@ -46,7 +46,8 @@ void main() {
       }
     });
 
-    testWidgets('onStateChange stream emits initialization event', (tester) async {
+    testWidgets('onStateChange stream emits initialization event',
+        (tester) async {
       // Reinitialize to trigger state change
       final stateChanges = <StateChange>[];
 

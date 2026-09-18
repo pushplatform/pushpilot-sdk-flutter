@@ -75,7 +75,9 @@ class PushMessage {
       messageId,
       title,
       body,
-      Object.hashAll(data.entries),
+      Object.hashAllUnordered(
+        data.entries.map((e) => Object.hash(e.key, e.value)),
+      ),
       type,
       receivedAt,
     );

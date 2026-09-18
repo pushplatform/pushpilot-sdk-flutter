@@ -81,7 +81,8 @@ void main() {
 
       expect(
         content,
-        matches(RegExp(r'deduplication.*native|native.*deduplication', caseSensitive: false)),
+        matches(RegExp(r'deduplication.*native|native.*deduplication',
+            caseSensitive: false)),
         reason: 'README should document that deduplication is in native layer',
       );
 

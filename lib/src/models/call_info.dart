@@ -67,7 +67,9 @@ class CallInfo {
       callId,
       callerId,
       callerName,
-      Object.hashAll(metadata.entries),
+      Object.hashAllUnordered(
+        metadata.entries.map((e) => Object.hash(e.key, e.value)),
+      ),
       receivedAt,
     );
   }

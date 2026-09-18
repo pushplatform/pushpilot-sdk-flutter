@@ -25,10 +25,14 @@ void main() {
     });
 
     test('fromJson parses valid values', () {
-      expect(StateChangeExtension.fromJson('initialized'), StateChange.initialized);
-      expect(StateChangeExtension.fromJson('permissionsGranted'), StateChange.permissionsGranted);
-      expect(StateChangeExtension.fromJson('permissionsDenied'), StateChange.permissionsDenied);
-      expect(StateChangeExtension.fromJson('registered'), StateChange.registered);
+      expect(StateChangeExtension.fromJson('initialized'),
+          StateChange.initialized);
+      expect(StateChangeExtension.fromJson('permissionsGranted'),
+          StateChange.permissionsGranted);
+      expect(StateChangeExtension.fromJson('permissionsDenied'),
+          StateChange.permissionsDenied);
+      expect(
+          StateChangeExtension.fromJson('registered'), StateChange.registered);
       expect(StateChangeExtension.fromJson('loggedIn'), StateChange.loggedIn);
       expect(StateChangeExtension.fromJson('loggedOut'), StateChange.loggedOut);
       expect(StateChangeExtension.fromJson('error'), StateChange.error);

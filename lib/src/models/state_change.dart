@@ -29,10 +29,13 @@ extension StateChangeExtension on StateChange {
     switch (value) {
       case 'initialized':
         return StateChange.initialized;
+      case 'permissionGranted':
       case 'permissionsGranted':
         return StateChange.permissionsGranted;
+      case 'permissionDenied':
       case 'permissionsDenied':
         return StateChange.permissionsDenied;
+      case 'tokenRefreshed':
       case 'registered':
         return StateChange.registered;
       case 'loggedIn':

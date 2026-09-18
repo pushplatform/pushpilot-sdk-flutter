@@ -318,9 +318,8 @@ class _MyAppState extends State<MyApp> {
               message.type == PushType.silent
                   ? Icons.notifications_off
                   : Icons.notifications,
-              color: message.type == PushType.silent
-                  ? Colors.grey
-                  : Colors.blue,
+              color:
+                  message.type == PushType.silent ? Colors.grey : Colors.blue,
             ),
           ),
         );

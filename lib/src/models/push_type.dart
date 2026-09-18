@@ -25,7 +25,8 @@ extension PushTypeExtension on PushType {
       case 'silent':
         return PushType.silent;
       default:
-        throw ArgumentError('Unknown PushType: $value');
+        // Default to normal for unknown values
+        return PushType.normal;
     }
   }
 }
