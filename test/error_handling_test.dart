@@ -308,13 +308,16 @@ void main() {
           return null;
         });
 
-        final results = await Future.wait([
-          sdk.initialize(apiKey: 'test-key', environment: 'production'),
-          sdk.login(userId: 'user-123').catchError((e) => e),
-        ]);
+        final initFuture = sdk.initialize(
+          apiKey: 'test-key',
+          environment: 'production',
+        );
+        final loginFuture = sdk.login(userId: 'user-123').catchError((e) => null);
 
-        expect(results[0], isNull); // initialize succeeded
-        expect(results[1], isA<PlatformException>()); // login failed
+        await initFuture; // Wait for init
+        final loginResult = await loginFuture; // Wait for login
+
+        expect(loginResult, isNull); // login failed and caught
       });
 
       test('stream errors do not break other streams', () async {

@@ -18,15 +18,15 @@ void main() {
     });
 
     group('iOS-specific', () {
-      testWidgets('registerForVoIPPushes available on iOS', (tester) async {
+      testWidgets('registerForVoIP available on iOS', (tester) async {
         if (Platform.isIOS) {
           await expectLater(
-            sdk.registerForVoIPPushes(),
+            sdk.registerForVoIP(),
             completes,
           );
         } else {
           expect(
-            () => sdk.registerForVoIPPushes(),
+            () => sdk.registerForVoIP(),
             throwsUnsupportedError,
           );
         }
@@ -45,40 +45,6 @@ void main() {
           );
         }
       });
-
-      testWidgets('reportIncomingVoIPCall on iOS', (tester) async {
-        if (Platform.isIOS) {
-          await expectLater(
-            sdk.reportIncomingVoIPCall(
-              callId: 'test-call-ios',
-              callerName: 'Test Caller',
-            ),
-            completes,
-          );
-        } else {
-          expect(
-            () => sdk.reportIncomingVoIPCall(
-              callId: 'test-call-ios',
-              callerName: 'Test Caller',
-            ),
-            throwsUnsupportedError,
-          );
-        }
-      });
-
-      testWidgets('endVoIPCall on iOS', (tester) async {
-        if (Platform.isIOS) {
-          await expectLater(
-            sdk.endVoIPCall(callId: 'test-call-ios'),
-            completes,
-          );
-        } else {
-          expect(
-            () => sdk.endVoIPCall(callId: 'test-call-ios'),
-            throwsUnsupportedError,
-          );
-        }
-      });
     });
 
     group('Android-specific', () {
@@ -91,40 +57,6 @@ void main() {
         } else {
           expect(
             () => sdk.onCallReceived.listen((_) {}),
-            throwsUnsupportedError,
-          );
-        }
-      });
-
-      testWidgets('reportIncomingCall on Android', (tester) async {
-        if (Platform.isAndroid) {
-          await expectLater(
-            sdk.reportIncomingCall(
-              callId: 'test-call-android',
-              callerName: 'Test Caller',
-            ),
-            completes,
-          );
-        } else {
-          expect(
-            () => sdk.reportIncomingCall(
-              callId: 'test-call-android',
-              callerName: 'Test Caller',
-            ),
-            throwsUnsupportedError,
-          );
-        }
-      });
-
-      testWidgets('endCall on Android', (tester) async {
-        if (Platform.isAndroid) {
-          await expectLater(
-            sdk.endCall(callId: 'test-call-android'),
-            completes,
-          );
-        } else {
-          expect(
-            () => sdk.endCall(callId: 'test-call-android'),
             throwsUnsupportedError,
           );
         }

@@ -137,9 +137,9 @@ void main() {
         StateChange.initialized,
         StateChange.loggedIn,
         StateChange.loggedOut,
-        StateChange.permissionGranted,
-        StateChange.permissionDenied,
-        StateChange.tokenRefreshed,
+        StateChange.permissionsGranted,
+        StateChange.permissionsDenied,
+        StateChange.registered,
         StateChange.error,
       ];
 

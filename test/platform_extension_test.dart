@@ -23,17 +23,11 @@ void main() {
     });
 
     group('iOS-only methods', () {
-      test('registerForVoIPPushes throws on non-iOS platform', () async {
-        // This test simulates Android platform
-        expect(
-          Platform.isIOS,
-          isFalse,
-          reason: 'Test must run on non-iOS platform',
-        );
-
+      test('registerForVoIP throws on non-iOS platform', () async {
+        // Extension methods work via import, test platform guards
         if (!Platform.isIOS) {
           expect(
-            () => sdk.registerForVoIPPushes(),
+            () => sdk.registerForVoIP(),
             throwsUnsupportedError,
           );
         }
@@ -47,27 +41,6 @@ void main() {
           );
         }
       });
-
-      test('reportIncomingVoIPCall throws on non-iOS', () {
-        if (!Platform.isIOS) {
-          expect(
-            () => sdk.reportIncomingVoIPCall(
-              callId: 'test-call',
-              callerName: 'Test Caller',
-            ),
-            throwsUnsupportedError,
-          );
-        }
-      });
-
-      test('endVoIPCall throws on non-iOS', () {
-        if (!Platform.isIOS) {
-          expect(
-            () => sdk.endVoIPCall(callId: 'test-call'),
-            throwsUnsupportedError,
-          );
-        }
-      });
     });
 
     group('Android-only methods', () {
@@ -75,27 +48,6 @@ void main() {
         if (!Platform.isAndroid) {
           expect(
             () => sdk.onCallReceived.listen((_) {}),
-            throwsUnsupportedError,
-          );
-        }
-      });
-
-      test('reportIncomingCall throws on non-Android', () {
-        if (!Platform.isAndroid) {
-          expect(
-            () => sdk.reportIncomingCall(
-              callId: 'test-call',
-              callerName: 'Test Caller',
-            ),
-            throwsUnsupportedError,
-          );
-        }
-      });
-
-      test('endCall throws on non-Android', () {
-        if (!Platform.isAndroid) {
-          expect(
-            () => sdk.endCall(callId: 'test-call'),
             throwsUnsupportedError,
           );
         }

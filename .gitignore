@@ -40,3 +40,4 @@ android/build/
 .buildlog/
 .history
 .svn/
+doc/api/

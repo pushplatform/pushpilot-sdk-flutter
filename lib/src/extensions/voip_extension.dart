@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'push_platform_flutter_impl.dart';
-import 'models/call_info.dart';
+import '../push_platform_flutter_impl.dart';
+import '../models/call_info.dart';
 
 /// iOS-specific VoIP extension for PushPlatformFlutter
 ///

@@ -27,13 +27,15 @@ void main() {
       });
 
       // Wait for potential push event with timeout
-      final message = await completer.future.timeout(
-        const Duration(seconds: 5),
-        onTimeout: () => throw TimeoutException('No push received'),
-      ).catchError((e) {
+      PushMessage? message;
+      try {
+        message = await completer.future.timeout(
+          const Duration(seconds: 5),
+        );
+      } catch (e) {
         // Timeout is expected in test environment without real push
-        return null;
-      });
+        message = null;
+      }
 
       await subscription.cancel();
 
