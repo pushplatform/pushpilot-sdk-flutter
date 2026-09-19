@@ -16,9 +16,9 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
     private var voipEventChannel: FlutterEventChannel!
     private var stateEventChannel: FlutterEventChannel!
 
-    private var pushEventSink: FlutterEventSink?
-    private var voipEventSink: FlutterEventSink?
-    private var stateEventSink: FlutterEventSink?
+    fileprivate var pushEventSink: FlutterEventSink?
+    fileprivate var voipEventSink: FlutterEventSink?
+    fileprivate var stateEventSink: FlutterEventSink?
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let methodChannel = FlutterMethodChannel(

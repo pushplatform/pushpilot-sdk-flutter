@@ -11,7 +11,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import com.pushplatform.sdk.PushPlatform
 import com.pushplatform.sdk.PushPlatformDelegate
-import com.pushplatform.sdk.models.Environment
+import com.pushplatform.sdk.Environment
 import com.pushplatform.sdk.models.SdkError
 import com.pushplatform.sdk.notifications.ParsedNotification
 import com.pushplatform.sdk.core.UserManager

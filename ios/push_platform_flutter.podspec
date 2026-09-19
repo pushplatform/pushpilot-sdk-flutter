@@ -16,7 +16,8 @@ Provides type-safe Dart API for push notifications, VoIP calls, and user managem
   s.swift_version    = '5.5'
 
   s.dependency 'Flutter'
-  s.dependency 'PushPlatformSDK', :path => '../../../sdk-ios'
+  # PushPlatformSDK path dependency must be specified in the app's Podfile, not here
+  s.dependency 'PushPlatformSDK'
 
   s.platform = :ios, '13.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
