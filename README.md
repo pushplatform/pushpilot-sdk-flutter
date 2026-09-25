@@ -177,7 +177,7 @@ Future<void> initialize({
 **Example**:
 ```dart
 await PushPlatformFlutter.instance.initialize(
-  apiKey: 'pk_live_abc123',
+  apiKey: '<set API key from dashboard>',
   environment: 'production',
   debugMode: false,
 );

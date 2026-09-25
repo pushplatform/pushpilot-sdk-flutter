@@ -197,7 +197,7 @@ Use the Push Platform Dashboard or API to send a test push notification:
 
 ```bash
 curl -X POST https://api.pushplatform.example/v1/push/send \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Authorization: Bearer $PUSHPLATFORM_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-<timestamp>",
