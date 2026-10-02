@@ -595,6 +595,6 @@ private fun mapError(error: SdkError): FlutterError {
 ## References
 
 - [ADR-0015: Flutter SDK Architecture](../../docs/adr/ADR-0015-flutter-sdk-architecture.md)
-- [iOS Native SDK Architecture](../../pushpilot-sdk-ios/README.md)
-- [Android Native SDK Architecture](../../pushpilot-sdk-android/README.md)
+- [iOS Native SDK Architecture](../pushpilot-sdk-ios/README.md)
+- [Android Native SDK Architecture](../pushpilot-sdk-android/README.md)
 - [Platform Channel Documentation](https://docs.flutter.dev/development/platform-integration/platform-channels)

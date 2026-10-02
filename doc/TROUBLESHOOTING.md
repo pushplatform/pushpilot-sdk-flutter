@@ -604,7 +604,7 @@ if (Platform.isIOS) {
    **Fix**: Update Podfile:
    ```ruby
    # ios/Podfile
-   pod 'PushPlatformSDK', :path => '../../../pushpilot-sdk-ios'
+   pod 'PushPlatformSDK', :path => '../pushpilot-sdk-ios'
    ```
 
 3. **CocoaPods Cache Corruption**
@@ -648,7 +648,7 @@ if (Platform.isIOS) {
    ```kotlin
    // android/settings.gradle.kts
    include(":pushpilot-sdk-android")
-   includeBuild("../../../pushpilot-sdk-android")
+   includeBuild("../pushpilot-sdk-android")
    ```
 
 ---

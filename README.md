@@ -577,7 +577,7 @@ Future<void> loginWithRetry(String userId, {int maxAttempts = 3}) async {
 Run Dart unit tests:
 
 ```bash
-cd sdk-flutter
+cd .
 flutter test
 ```
 
@@ -593,7 +593,7 @@ lcov --summary coverage/lcov.info
 Run Flutter integration tests (requires iOS simulator or Android emulator):
 
 ```bash
-cd sdk-flutter/example
+cd example
 flutter test integration_test/
 ```
 
@@ -602,14 +602,14 @@ flutter test integration_test/
 **iOS Tests** (requires Xcode):
 
 ```bash
-cd sdk-flutter/ios
+cd ios
 xcodebuild test -scheme PushPlatformFlutter -destination 'platform=iOS Simulator,name=iPhone 15'
 ```
 
 **Android Tests** (requires Android Studio):
 
 ```bash
-cd sdk-flutter/android
+cd android
 ./gradlew test
 ```
 
