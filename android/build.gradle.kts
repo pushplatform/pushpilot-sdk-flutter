@@ -23,7 +23,7 @@ android {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("sdk-android:sdk")
+    implementation("com.pushplatform:sdk-android:1.0.0")
 
     // Test dependencies
     testImplementation("junit:junit:4.13.2")

@@ -596,7 +596,7 @@ if (Platform.isIOS) {
 
    **Fix**: Ensure native iOS SDK exists:
    ```bash
-   ls -la ../sdk-ios/PushPlatformSDK.podspec
+   ls -la ../pushpilot-sdk-ios/PushPlatformSDK.podspec
    ```
 
 2. **Invalid Podfile Path**
@@ -604,7 +604,7 @@ if (Platform.isIOS) {
    **Fix**: Update Podfile:
    ```ruby
    # ios/Podfile
-   pod 'PushPlatformSDK', :path => '../../../sdk-ios'
+   pod 'PushPlatformSDK', :path => '../../../pushpilot-sdk-ios'
    ```
 
 3. **CocoaPods Cache Corruption**
@@ -629,7 +629,7 @@ if (Platform.isIOS) {
 
    **Fix**: Ensure native Android SDK exists:
    ```bash
-   ls -la ../sdk-android/build.gradle.kts
+   ls -la ../pushpilot-sdk-android/build.gradle.kts
    ```
 
 2. **Invalid Gradle Dependency**
@@ -638,7 +638,7 @@ if (Platform.isIOS) {
    ```kotlin
    // android/build.gradle.kts
    dependencies {
-       implementation(project(":sdk-android"))
+       implementation(project(":pushpilot-sdk-android"))
    }
    ```
 
@@ -647,8 +647,8 @@ if (Platform.isIOS) {
    **Fix**: Include SDK module:
    ```kotlin
    // android/settings.gradle.kts
-   include(":sdk-android")
-   project(":sdk-android").projectDir = file("../../sdk-android")
+   include(":pushpilot-sdk-android")
+   includeBuild("../../../pushpilot-sdk-android")
    ```
 
 ---

@@ -80,7 +80,7 @@
 
 3. **Composite build setup:**
    - `sdk-flutter/example/android/settings.gradle.kts`: 
-     - `include(":sdk-android")` → `includeBuild("../../../sdk-android")`
+     - `include(":sdk-android")` → `includeBuild("../../../pushpilot-sdk-android")`
    - Eliminates plugin version conflicts
    - Proper dependency resolution across builds
 

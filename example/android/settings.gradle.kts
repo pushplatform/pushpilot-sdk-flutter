@@ -26,4 +26,4 @@ plugins {
 include(":app")
 
 // Include sdk-android as composite build to avoid plugin version conflicts
-includeBuild("../../../sdk-android")
+includeBuild("../../../pushpilot-sdk-android")
