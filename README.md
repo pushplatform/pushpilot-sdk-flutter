@@ -43,7 +43,7 @@ dependencies:
 
 ```ruby
 # ios/Podfile
-pod 'PushPlatformSDK', :path => '../../../sdk-ios'
+pod 'PushPlatformSDK', :path => '../pushpilot-sdk-ios'
 ```
 
 ### Android Setup
@@ -53,7 +53,7 @@ pod 'PushPlatformSDK', :path => '../../../sdk-ios'
 ```kotlin
 // android/build.gradle.kts
 dependencies {
-    implementation(project(":sdk-android"))
+    implementation(project(":pushpilot-sdk-android"))
 }
 ```
 

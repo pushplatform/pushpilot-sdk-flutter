@@ -122,7 +122,7 @@ Same as iOS — edit `lib/main.dart` and replace the demo API key.
 The example app uses the native iOS SDK via CocoaPods dependency declared in `../ios/push_platform_flutter.podspec`:
 
 ```ruby
-s.dependency 'PushPlatformSDK', :path => '../../../sdk-ios'
+s.dependency 'PushPlatformSDK', :path => '../../pushpilot-sdk-ios'
 ```
 
 Make sure `sdk-ios` is built and available.
@@ -133,7 +133,7 @@ The example app uses the native Android SDK via Gradle dependency declared in `.
 
 ```kotlin
 dependencies {
-    implementation(project(":sdk-android"))
+    implementation(project(":pushpilot-sdk-android"))
 }
 ```
 
