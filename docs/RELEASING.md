@@ -35,15 +35,17 @@ iOS: CocoaPod `PushPlatformSDK` **1.0.0**. В podspec плагина закре�
 
 ## Публикация и Git
 
-Публикация на pub.dev разрешена владельцем. Статус: `flutter pub publish --force` запущен, валидация пройдена, CLI ожидает Google OAuth владельца. Пакет пока **не опубликован**. Владелец должен открыть предложенный CLI URL в браузере на этом Mac, выбрать Google Account и подтвердить доступ; callback приходит на localhost. Пароли и OAuth-коды в чат не передаются. После callback CLI продолжит загрузку.
+Публикация **завершена**: после Google OAuth владельца `flutter pub publish --force` успешно загрузил `push_platform_flutter` **1.0.0**. [Публичный API pub.dev](https://pub.dev/api/packages/push_platform_flutter) вернул HTTP 200 и `latest.version = 1.0.0`. Время публикации: **2026-10-12 12:29:10 UTC / 15:29:10 Europe/Moscow**. Дополнительная авторизация для этого релиза не требуется.
+
+[Опубликованный архив](https://pub.dev/api/archives/push_platform_flutter-1.0.0.tar.gz) скачан анонимно. SHA-256: `10016631988852f4108530bba11692d80ffc3c343e9c21bf73de703914906e8a`; совпадает с API pub.dev. Все **48 файлов** архива побайтово совпадают с релизным checkout; внутренние материалы отсутствуют. Ранее пройденные тесты и сборки не повторялись.
 
 Исходный release commit: `2a1be8c` (`feat: release standalone PushPilot Flutter SDK 1.0.0`), отправлен в `origin/release/flutter-1.0.0`. Отчёт обновляется отдельным commit; `docs/` исключён из pub-архива.
 
-Страница пакета после публикации: https://pub.dev/packages/push_platform_flutter
+Опубликованный пакет: https://pub.dev/packages/push_platform_flutter
 
 Создание PR: https://github.com/pushplatform/pushpilot-sdk-flutter/compare/main...release/flutter-1.0.0?expand=1
 
-Новый пакет pub.dev сначала публикуется от Google Account; после публикации при необходимости владелец может передать его verified publisher в настройках пакета. Секреты не передаются в чат. Если CLI предложит авторизацию, владелец открывает URL OAuth из CLI и подтверждает доступ в браузере.
+Первая публикация выполнена от авторизованного Google Account. При необходимости владелец может передать пакет verified publisher в разделе Admin на pub.dev; выбор/перенос publisher в этом релизе не выполнялся. Секреты не передавались в чат.
 
 Тег `v1.0.0` до merge не создаётся. После merge владелец может отметить объединённый релизный commit этим тегом; повторно публиковать 1.0.0 нельзя.
 
