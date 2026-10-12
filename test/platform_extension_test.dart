@@ -58,6 +58,8 @@ void main() {
       test('initialize works on any platform', () async {
         await expectLater(
           sdk.initialize(
+            applicationId: '11111111-1111-1111-1111-111111111111',
+            apiBaseURL: 'https://api.your-company.example',
             apiKey: 'test-key',
             environment: 'development',
           ),

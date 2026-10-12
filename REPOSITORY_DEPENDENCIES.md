@@ -1,8 +1,8 @@
-# Dependencies between repositories
+# Зависимости
 
-`pushpilot-sdk-flutter` bridges the native SDKs:
+Flutter-плагин использует только опубликованные нативные SDK 1.0.0:
 
-- iOS: `pushpilot-sdk-ios` via CocoaPods.
-- Android: `pushpilot-sdk-android` as a Gradle module or published artifact.
+- Android: `com.pushplatform:sdk-android:1.0.0`, публичный Maven по адресу `https://raw.githubusercontent.com/pushplatform/pushpilot-sdk-android/maven/`.
+- iOS: `PushPlatformSDK` 1.0.0 из CocoaPods Trunk.
 
-Applications using the plugin also configure the API served by `pushpilot-server`.
+Локальные модули, соседние checkout и Maven Local для установки не используются. Серверный API и провайдеры доставки настраивает приложение. См. README.md и docs/RELEASING.md.

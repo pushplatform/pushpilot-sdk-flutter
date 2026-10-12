@@ -11,6 +11,8 @@ void main() {
 
     setUp(() async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
+        apiBaseURL: 'https://api.your-company.example',
         apiKey: 'integration-test-key',
         environment: 'development',
         debugMode: true,

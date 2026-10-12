@@ -41,6 +41,7 @@ void main() {
 
     test('initialize() calls platform with correct arguments', () async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
         apiKey: 'test-key',
         apiBaseURL: 'https://api.test',
         environment: 'development',
@@ -51,12 +52,16 @@ void main() {
       expect(log[0].method, 'initialize');
       expect(log[0].arguments['apiKey'], 'test-key');
       expect(log[0].arguments['apiBaseURL'], 'https://api.test');
+      expect(log[0].arguments['applicationId'],
+          '11111111-1111-1111-1111-111111111111');
       expect(log[0].arguments['environment'], 'development');
       expect(log[0].arguments['debugMode'], true);
     });
 
     test('initialize() defaults debugMode to false', () async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
+        apiBaseURL: 'https://api.your-company.example',
         apiKey: 'test-key',
         environment: 'production',
       );
@@ -115,7 +120,11 @@ void main() {
       });
 
       expect(
-        () => sdk.initialize(apiKey: 'bad-key', environment: 'production'),
+        () => sdk.initialize(
+            applicationId: '11111111-1111-1111-1111-111111111111',
+            apiBaseURL: 'https://api.your-company.example',
+            apiKey: 'bad-key',
+            environment: 'production'),
         throwsA(isA<PlatformException>()),
       );
     });

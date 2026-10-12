@@ -2,6 +2,8 @@ package com.pushplatform.flutter
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -15,6 +17,7 @@ import com.pushplatform.sdk.Environment
 import com.pushplatform.sdk.models.SdkError
 import com.pushplatform.sdk.notifications.ParsedNotification
 import com.pushplatform.sdk.core.UserManager
+import com.pushplatform.sdk.utils.PermissionChecker
 
 /// Flutter plugin for Push Platform Android SDK
 ///
@@ -37,6 +40,9 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
     private var stateEventSink: EventChannel.EventSink? = null
 
     private var activity: Activity? = null
+    private var activityBinding: ActivityPluginBinding? = null
+    private var pendingPermissionResult: MethodChannel.Result? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     // FlutterPlugin
 
@@ -59,6 +65,8 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        pendingPermissionResult?.error("DETACHED", "Flutter engine detached", null)
+        pendingPermissionResult = null
         methodChannel.setMethodCallHandler(null)
         pushEventChannel.setStreamHandler(null)
         callEventChannel.setStreamHandler(null)
@@ -69,20 +77,26 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
     // ActivityAware
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activityBinding = binding
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
+        activityBinding?.removeRequestPermissionsResultListener(this)
+        activityBinding = null
         activity = null
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        activity = binding.activity
-        binding.addRequestPermissionsResultListener(this)
+        onAttachedToActivity(binding)
     }
 
     override fun onDetachedFromActivity() {
+        activityBinding?.removeRequestPermissionsResultListener(this)
+        activityBinding = null
+        pendingPermissionResult?.error("NO_ACTIVITY", "Activity detached", null)
+        pendingPermissionResult = null
         activity = null
     }
 
@@ -117,7 +131,12 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
             return
         }
 
-        val apiBaseURL = args["apiBaseURL"] as? String // Not used in Android SDK
+        val apiBaseURL = args["apiBaseURL"] as? String
+        val applicationId = args["applicationId"] as? String
+        if (apiBaseURL.isNullOrBlank() || applicationId.isNullOrBlank()) {
+            result.error("INVALID_ARGUMENTS", "apiBaseURL and applicationId are required", null)
+            return
+        }
         val debugMode = args["debugMode"] as? Boolean ?: false
 
         // Map environment string to SDK enum
@@ -139,10 +158,23 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
                 context = context,
                 apiKey = apiKey,
                 environment = environment,
-                debugMode = debugMode
-            )
-            stateEventSink?.success("initialized")
-            result.success(null)
+                debugMode = debugMode,
+                apiBaseUrl = apiBaseURL,
+                applicationId = applicationId
+            ) { configurationResult ->
+                mainHandler.post {
+                    configurationResult.fold(
+                        onSuccess = { result.success(null) },
+                        onFailure = { error ->
+                            stateEventSink?.success("error")
+                            result.error(
+                                if (error is SdkError) mapSdkErrorCode(error) else "CONFIGURATION_FAILED",
+                                "PushPilot initialization failed", null
+                            )
+                        }
+                    )
+                }
+            }
         } catch (e: Exception) {
             result.error("CONFIGURATION_FAILED", e.message ?: "Unknown error", null)
         }
@@ -167,9 +199,12 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
             return
         }
 
-        // Request permission (result will come via onRequestPermissionsResult)
+        if (pendingPermissionResult != null) {
+            result.error("PERMISSION_REQUEST_IN_PROGRESS", "A permission request is already pending", null)
+            return
+        }
+        pendingPermissionResult = result
         sdk.requestNotificationPermission(act)
-        result.success(null) // Permission result will come via delegate callback
     }
 
     private fun handleLogin(call: MethodCall, result: MethodChannel.Result) {
@@ -191,17 +226,19 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         }
 
         sdk.login(userId) { loginResult ->
-            when (loginResult) {
-                is UserManager.Result.Success -> {
-                    stateEventSink?.success("loggedIn")
-                    result.success(sdk.getInstallationId())
-                }
-                is UserManager.Result.Failure -> {
-                    result.error(
-                        mapSdkErrorCode(loginResult.error),
-                        loginResult.error.message,
-                        null
-                    )
+            mainHandler.post {
+                when (loginResult) {
+                    is UserManager.Result.Success -> {
+                        stateEventSink?.success("loggedIn")
+                        result.success(sdk.getInstallationId())
+                    }
+                    is UserManager.Result.Failure -> {
+                        result.error(
+                            mapSdkErrorCode(loginResult.error),
+                            loginResult.error.message,
+                            null
+                        )
+                    }
                 }
             }
         }
@@ -214,17 +251,19 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         }
 
         sdk.logout { logoutResult ->
-            when (logoutResult) {
-                is UserManager.Result.Success -> {
-                    stateEventSink?.success("loggedOut")
-                    result.success(null)
-                }
-                is UserManager.Result.Failure -> {
-                    result.error(
-                        mapSdkErrorCode(logoutResult.error),
-                        logoutResult.error.message,
-                        null
-                    )
+            mainHandler.post {
+                when (logoutResult) {
+                    is UserManager.Result.Success -> {
+                        stateEventSink?.success("loggedOut")
+                        result.success(null)
+                    }
+                    is UserManager.Result.Failure -> {
+                        result.error(
+                            mapSdkErrorCode(logoutResult.error),
+                            logoutResult.error.message,
+                            null
+                        )
+                    }
                 }
             }
         }
@@ -237,6 +276,7 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         permissions: Array<out String>,
         grantResults: IntArray
     ): Boolean {
+        if (requestCode != PermissionChecker.REQUEST_CODE_NOTIFICATION_PERMISSION) return false
         sdk.onRequestPermissionsResult(requestCode, grantResults)
         return true
     }
@@ -249,7 +289,7 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
             "title" to notification.title,
             "body" to notification.body,
             "data" to notification.customData,
-            "type" to if (notification.callId != null) "silent" else "normal",
+            "type" to if (notification.title == null && notification.body == null) "silent" else "normal",
             "receivedAt" to System.currentTimeMillis()
         )
     }
@@ -281,34 +321,40 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
 
     private class DelegateImpl(private val plugin: FlutterPushPlatformPlugin) : PushPlatformDelegate {
         override fun didInitialize(installationId: String) {
-            plugin.stateEventSink?.success("initialized")
+            plugin.mainHandler.post { plugin.stateEventSink?.success("initialized") }
         }
 
         override fun didUpdateFcmToken() {
             // SECURITY: Token is NEVER passed to Dart
-            plugin.stateEventSink?.success("registered")
+            plugin.mainHandler.post { plugin.stateEventSink?.success("registered") }
         }
 
         override fun didFailToRegisterFcmToken(error: SdkError) {
-            plugin.stateEventSink?.success("error")
+            plugin.mainHandler.post { plugin.stateEventSink?.success("error") }
         }
 
         override fun didReceiveNotification(notification: ParsedNotification, isInForeground: Boolean) {
-            // Check if this is a call notification (high-priority)
-            if (notification.callId != null) {
-                val payload = plugin.serializeCallInfo(notification)
-                plugin.callEventSink?.success(payload)
-            } else {
-                val payload = plugin.serializeNotification(notification)
-                plugin.pushEventSink?.success(payload)
+            plugin.mainHandler.post {
+                // Check if this is a call notification (high-priority)
+                if (notification.callId != null) {
+                    val payload = plugin.serializeCallInfo(notification)
+                    plugin.callEventSink?.success(payload)
+                } else {
+                    val payload = plugin.serializeNotification(notification)
+                    plugin.pushEventSink?.success(payload)
+                }
             }
         }
 
         override fun onNotificationPermissionResult(granted: Boolean) {
-            if (granted) {
-                plugin.stateEventSink?.success("permissionsGranted")
-            } else {
-                plugin.stateEventSink?.success("permissionsDenied")
+            plugin.mainHandler.post {
+                if (granted) {
+                    plugin.stateEventSink?.success("permissionsGranted")
+                } else {
+                    plugin.stateEventSink?.success("permissionsDenied")
+                }
+                plugin.pendingPermissionResult?.success(granted)
+                plugin.pendingPermissionResult = null
             }
         }
     }

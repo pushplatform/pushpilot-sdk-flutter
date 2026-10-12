@@ -3,7 +3,25 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-android {
+group = "com.pushplatform.flutter"
+version = "1.0.0"
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+// The app also resolves this transitive AAR on its runtime classpath.
+rootProject.allprojects {
+    repositories {
+        maven {
+            url = uri("https://raw.githubusercontent.com/pushplatform/pushpilot-sdk-android/maven/")
+            content { includeModule("com.pushplatform", "sdk-android") }
+        }
+    }
+}
+
+extensions.configure<com.android.build.api.dsl.LibraryExtension> {
     namespace = "com.pushplatform.flutter"
     compileSdk = 34
 
@@ -15,9 +33,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+}
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
     }
 }
 

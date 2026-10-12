@@ -11,6 +11,8 @@
 ///
 /// // Initialize
 /// await PushPlatformFlutter.instance.initialize(
+///   applicationId: '11111111-1111-1111-1111-111111111111',
+///   apiBaseURL: 'https://api.your-company.example',
 ///   apiKey: 'your-api-key',
 ///   environment: 'production',
 /// );

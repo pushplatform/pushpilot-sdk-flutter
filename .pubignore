@@ -1,0 +1,60 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+pubspec.lock
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# iOS/Swift/CocoaPods
+ios/.symlinks/
+ios/Pods/
+ios/Podfile.lock
+ios/.generated/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+# Example app iOS generated files
+example/ios/
+
+# Android/Kotlin/Gradle
+android/.gradle/
+android/local.properties
+android/.cxx/
+android/captures/
+android/build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Visual Studio Code
+.vscode/
+
+# Miscellaneous
+.release-check/
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+doc/api/
+
+# Release tooling and historical internal reports are not package assets.
+.github/
+.release-check/
+docs/
+doc/
+VERIFICATION_REPORT.md
+REPOSITORY_DEPENDENCIES.md
+android/src/test/
+ios/Tests/
+example/integration_test/
+example/lib/main_original.dart
+example/lib/main_verification.dart

@@ -58,6 +58,7 @@ class _VerificationAppState extends State<VerificationApp> {
     final initStart = DateTime.now();
     try {
       await _sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
         apiKey: 'test-api-key-flutter',
         apiBaseURL: 'https://api.test.pushplatform.example',
         environment: 'development',
@@ -210,7 +211,9 @@ class _VerificationAppState extends State<VerificationApp> {
                                 : isHeader
                                     ? Colors.blue.shade700
                                     : Colors.black87,
-                        fontWeight: isHeader || isError ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isHeader || isError
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   );

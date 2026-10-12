@@ -10,6 +10,7 @@ void main() {
 
     testWidgets('initialize SDK with valid configuration', (tester) async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
         apiKey: 'integration-test-key',
         apiBaseURL: 'https://api.test.pushplatform.example',
         environment: 'development',
@@ -24,6 +25,8 @@ void main() {
 
     testWidgets('login with userId after initialization', (tester) async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
+        apiBaseURL: 'https://api.your-company.example',
         apiKey: 'integration-test-key',
         environment: 'development',
       );
@@ -36,6 +39,8 @@ void main() {
 
     testWidgets('logout clears user session', (tester) async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
+        apiBaseURL: 'https://api.your-company.example',
         apiKey: 'integration-test-key',
         environment: 'development',
       );
@@ -53,6 +58,8 @@ void main() {
 
     testWidgets('deviceId remains stable across login/logout', (tester) async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
+        apiBaseURL: 'https://api.your-company.example',
         apiKey: 'integration-test-key',
         environment: 'development',
       );
@@ -71,6 +78,8 @@ void main() {
 
     testWidgets('requestPermissions returns result', (tester) async {
       await sdk.initialize(
+        applicationId: '11111111-1111-1111-1111-111111111111',
+        apiBaseURL: 'https://api.your-company.example',
         apiKey: 'integration-test-key',
         environment: 'development',
       );
