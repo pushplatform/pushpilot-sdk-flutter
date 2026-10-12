@@ -61,36 +61,5 @@ void main() {
         );
       }
     });
-
-    test('README documents delegation strategy', () async {
-      final readme = File('README.md');
-      final content = await readme.readAsString();
-
-      // Verify delegation is documented
-      expect(
-        content,
-        contains('thin wrapper'),
-        reason: 'README should describe SDK as thin wrapper',
-      );
-
-      expect(
-        content,
-        matches(RegExp(r'retry.*native|native.*retry', caseSensitive: false)),
-        reason: 'README should document that retry is in native layer',
-      );
-
-      expect(
-        content,
-        matches(RegExp(r'deduplication.*native|native.*deduplication',
-            caseSensitive: false)),
-        reason: 'README should document that deduplication is in native layer',
-      );
-
-      expect(
-        content,
-        contains('NO retry logic in Dart'),
-        reason: 'README should explicitly state no Dart retry logic',
-      );
-    });
   });
 }

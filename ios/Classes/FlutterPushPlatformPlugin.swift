@@ -40,6 +40,7 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
 
         let instance = FlutterPushPlatformPlugin()
         registrar.addMethodCallDelegate(instance, channel: methodChannel)
+        registrar.addApplicationDelegate(instance)
 
         pushEventChannel.setStreamHandler(PushEventStreamHandler(instance))
         voipEventChannel.setStreamHandler(VoIPEventStreamHandler(instance))
@@ -87,7 +88,12 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        let apiBaseURL = args["apiBaseURL"] as? String ?? "https://api.pushplatform.example"
+        guard let apiBaseURL = args["apiBaseURL"] as? String,
+              let applicationId = args["applicationId"] as? String,
+              let applicationID = UUID(uuidString: applicationId) else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", message: "apiBaseURL and a UUID applicationId are required", details: nil))
+            return
+        }
         let debugMode = args["debugMode"] as? Bool ?? false
 
         // Map environment string to SDK enum
@@ -114,16 +120,47 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             apiKey: apiKey,
             apiBaseURL: apiBaseURL,
             environment: environment,
-            debugMode: debugMode
-        )
+            debugMode: debugMode,
+            applicationID: applicationID
+        ) { configurationResult in
+            switch configurationResult {
+            case .success:
+                result(nil)
+            case .failure(let error):
+                result(FlutterError(code: self.mapErrorCode(error), message: "PushPilot initialization failed", details: nil))
+            }
+        }
 
         // Note: VoIP registration happens automatically after configure()
         // PushKitManager is initialized in PushPlatform init and registers immediately
 
-        result(nil)
+    }
+
+    public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        sdk?.didRegisterAPNsToken(deviceToken)
+    }
+
+    public func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        sdk?.didFailToRegisterAPNs(error)
+    }
+
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                      withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        guard let sdk = sdk else { completionHandler([]); return }
+        sdk.handleForegroundNotification(notification, completionHandler: completionHandler)
+    }
+
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                      withCompletionHandler completionHandler: @escaping () -> Void) {
+        guard let sdk = sdk else { completionHandler(); return }
+        sdk.handleNotificationResponse(response, completionHandler: completionHandler)
     }
 
     private func handleRequestPermissions(result: @escaping FlutterResult) {
+        guard sdk?.getInstallationID() != nil else {
+            result(FlutterError(code: "NOT_INITIALIZED", message: "Await initialize() first", details: nil))
+            return
+        }
         // SDK doesn't expose requestAuthorization - call UNUserNotificationCenter directly
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
@@ -176,17 +213,19 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
         }
 
         sdk.login(userID: userId) { loginResult in
-            switch loginResult {
-            case .success:
-                self.stateEventSink?("loggedIn")
-                // Return installation ID as "deviceId"
-                result(sdk.getInstallationID()?.uuidString)
-            case .failure(let error):
-                result(FlutterError(
-                    code: self.mapErrorCode(error),
-                    message: error.localizedDescription,
-                    details: nil
-                ))
+            DispatchQueue.main.async {
+                switch loginResult {
+                case .success:
+                    self.stateEventSink?("loggedIn")
+                    // Return installation ID as "deviceId"
+                    result(sdk.getInstallationID()?.uuidString)
+                case .failure(let error):
+                    result(FlutterError(
+                        code: self.mapErrorCode(error),
+                        message: error.localizedDescription,
+                        details: nil
+                    ))
+                }
             }
         }
     }
@@ -202,16 +241,18 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
         }
 
         sdk.logout { logoutResult in
-            switch logoutResult {
-            case .success:
-                self.stateEventSink?("loggedOut")
-                result(nil)
-            case .failure(let error):
-                result(FlutterError(
-                    code: self.mapErrorCode(error),
-                    message: error.localizedDescription,
-                    details: nil
-                ))
+            DispatchQueue.main.async {
+                switch logoutResult {
+                case .success:
+                    self.stateEventSink?("loggedOut")
+                    result(nil)
+                case .failure(let error):
+                    result(FlutterError(
+                        code: self.mapErrorCode(error),
+                        message: error.localizedDescription,
+                        details: nil
+                    ))
+                }
             }
         }
     }

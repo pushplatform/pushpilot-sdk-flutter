@@ -36,20 +36,23 @@ class PushPlatformFlutter {
   /// Must be called before any other SDK methods.
   ///
   /// [apiKey] - API key from push-platform dashboard (devices:write scope)
-  /// [apiBaseURL] - Base URL of the push platform API (default: https://api.pushplatform.example)
+  /// [apiBaseURL] - URL of your PushPilot API.
+  /// [applicationId] - PushPilot application UUID, not the bundle/package ID.
   /// [environment] - Environment name ('production' or 'development')
   /// [debugMode] - Enable verbose logging (default: false)
   ///
   /// Throws [PlatformException] on initialization failure.
   Future<void> initialize({
     required String apiKey,
-    String apiBaseURL = 'https://api.pushplatform.example',
+    required String apiBaseURL,
+    required String applicationId,
     required String environment,
     bool debugMode = false,
   }) async {
     final args = {
       'apiKey': apiKey,
       'apiBaseURL': apiBaseURL,
+      'applicationId': applicationId,
       'environment': environment,
       'debugMode': debugMode,
     };
@@ -74,6 +77,7 @@ class PushPlatformFlutter {
   ///
   /// [userId] - Unique user identifier
   /// [metadata] - Optional user metadata
+  /// Reserved for compatibility; native SDKs 1.0.0 do not send this value.
   ///
   /// Returns the device ID on success, or null on failure.
   ///
