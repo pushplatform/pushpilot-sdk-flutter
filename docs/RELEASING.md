@@ -29,13 +29,15 @@ iOS: CocoaPod `PushPlatformSDK` **1.0.0**. В podspec плагина закре�
 - Создано одно новое приложение `.release-check/consumer` командой `flutter create --platforms=android,ios`. Пакет установлен из изолированного снимка релизного содержимого `.release-check/package`; приложение не ссылается на рабочий checkout SDK или соседние репозитории. До первой публикации это path dependency на копию пакета, а не установка уже размещённого пакета с pub.dev.
 - Android: `flutter build apk --debug --no-pub` — **успех**, `build/app/outputs/flutter-apk/app-debug.apk`. Приложение использует стандартные Gradle-файлы Flutter и опубликованный Maven AAR; Maven Local отсутствует. Первые неудачные попытки выявили устаревший DSL и отсутствие Maven URL на app runtime classpath; исправлены в самом плагине. После успеха сборка не повторялась.
 - iOS: `flutter build ios --simulator --no-pub` — **успех**, `build/ios/iphonesimulator/Runner.app` (Xcode build 26,7 s). `Podfile.lock` подтверждает `PushPlatformSDK (1.0.0)` из `trunk`, checksum `16c9e4d81fdf93a69baafb921602b743b8c37934`. Сначала отсутствовал свежий индекс, затем возникла ошибка HTTP/2 загрузки spec. Установка выполнена через одноразовый Ruby wrapper с HTTP/1.1; публичный источник сохранён, установленный CocoaPods и его исходники не менялись. После успешной сборки она не повторялась.
-- `flutter pub publish --dry-run`: проверен архив (~32 KB); единственное предупреждение предварительного запуска — ещё не закоммиченные файлы. Итоговая проверка выполняется после commit.
+- `flutter pub publish --dry-run` после commit — **успех, 0 warnings**, архив ~32 KB. Предварительные запуски имели единственное предупреждение о незакоммиченных файлах; после commit оно устранено.
 
 Приложение не запускалось на устройстве, реальные push, API credentials, Firebase config и APNs signing не использовались. Нативные исторические XCTest/JUnit и интеграционные сценарии с сервером не запускались; они не являются доказательством работоспособности реальной доставки. Пройденные проверки не повторяются без новых изменений или ошибок.
 
 ## Публикация и Git
 
-Публикация на pub.dev разрешена владельцем. Статус: проверки завершены; публикация подготовлена к запуску. Результат загрузки будет дописан отдельным commit.
+Публикация на pub.dev разрешена владельцем. Статус: `flutter pub publish --force` запущен, валидация пройдена, CLI ожидает Google OAuth владельца. Пакет пока **не опубликован**. Владелец должен открыть предложенный CLI URL в браузере на этом Mac, выбрать Google Account и подтвердить доступ; callback приходит на localhost. Пароли и OAuth-коды в чат не передаются. После callback CLI продолжит загрузку.
+
+Исходный release commit: `2a1be8c` (`feat: release standalone PushPilot Flutter SDK 1.0.0`), отправлен в `origin/release/flutter-1.0.0`. Отчёт обновляется отдельным commit; `docs/` исключён из pub-архива.
 
 Страница пакета после публикации: https://pub.dev/packages/push_platform_flutter
 
