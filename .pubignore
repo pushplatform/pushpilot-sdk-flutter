@@ -48,6 +48,7 @@ doc/api/
 
 # Release tooling and historical internal reports are not package assets.
 .github/
+scripts/
 .release-check/
 docs/
 doc/

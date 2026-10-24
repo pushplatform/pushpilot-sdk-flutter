@@ -1,3 +1,66 @@
+# Релиз PushPilot Flutter SDK 1.0.1
+
+Дата подготовки: 2026-10-24. Пакет: `push_platform_flutter` 1.0.1; patch относительно опубликованной на pub.dev версии 1.0.0. Ветка: `release/flutter-1.0.1-bundled-ios`. Merge выполняет владелец.
+
+## Поставка iOS
+
+CocoaPods по-прежнему используется для интеграции Flutter. Внешняя зависимость `PushPlatformSDK` из Trunk удалена. Публикация нашего native SDK в CocoaPods Trunk для этого и будущих Flutter-релизов больше не нужна.
+
+В pub-пакете находятся все 18 Swift-файлов из `Sources/PushPlatformSDK` опубликованного тега iOS SDK `v1.0.0`, его MIT `LICENSE` и manifest с SHA-256 каждого upstream-файла. Отдельных ресурсов (в том числе privacy manifest) в этом теге нет. Зафиксированы:
+
+- Репозиторий: https://github.com/pushplatform/pushpilot-sdk-ios.git
+- Объект аннотированного тега `v1.0.0`: `db4a57e9d8d2d3fcafc914bd2aa59cc99f9d5d4f`.
+- Commit: `c67bcdf57ab150a5835570e4b695b173c1953bc1`.
+
+Podspec берёт локальные файлы из `ios/Bundled/PushPlatformSDK/Sources/PushPlatformSDK` и объявляет системные frameworks из upstream podspec. Native-типы компилируются в модуле `push_platform_flutter`, поэтому отдельный `import PushPlatformSDK` в Swift-мосте удалён. Dart-import, module name Flutter-плагина, публичный Dart API и native-типы сохранены. Отдельный Swift-модуль `PushPlatformSDK` этим пакетом не поставляется.
+
+Пользователю достаточно установить пакет с pub.dev и выполнить обычную интеграцию Flutter через CocoaPods. Native-исходники уже в архиве: приватный Git, соседние checkout, отдельная запись native pod в Podfile и ручная настройка путей не нужны. SPM-интеграция не добавлялась. Android SDK остаётся `com.pushplatform:sdk-android:1.0.0`; посторонние зависимости не обновлялись.
+
+## Воспроизводимое обновление bundled SDK
+
+Скрипт нужен только сопровождающему, а не пользователю пакета. Требуются Python 3 и Git; сеть самому скрипту не нужна. Он читает Git-объекты указанного iOS-репозитория, не меняет его checkout и не зависит от его HEAD или незакоммиченных файлов.
+
+```sh
+python3 scripts/update-bundled-ios.py --ios-repo ../pushpilot-sdk-ios
+```
+
+Путь может указывать на любой локальный clone с нужным опубликованным тегом. Скрипт сверяет объект тега и его commit с `ios/native-sdk.lock.json`, экспортирует полное дерево `Sources/PushPlatformSDK` и LICENSE/NOTICE/COPYING непосредственно из зафиксированного commit и формирует `ios/Bundled/PushPlatformSDK/manifest.json`. Повторный экспорт того же тега даёт те же байты и manifest. При несовпадении SHA выполнение прекращается до замены bundled-файлов.
+
+Для нового native-релиза сначала сверить опубликованный тег и SHA, изменить lock, затем запустить экспорт. Просмотреть изменения исходников, лицензий и ресурсов, сверить frameworks, deployment target и Swift version с upstream podspec. При появлении ресурсов добавить их в `resources`/`resource_bundles` Flutter podspec согласно upstream. Не копировать upstream Package.swift, тесты, примеры и результаты сборок. Закоммитить bundled-файлы вместе с lock и скриптом. Скрипт исключён из pub-архива, а исходники, лицензия, lock и manifest включены.
+
+## Объём проверки 1.0.1
+
+Только просмотр итогового diff и состава публикуемого пакета. Тесты, анализатор, сборки, симуляторы, pod install и запуск примеров не выполняются. Работоспособность сборки 1.0.1 не проверена; результаты 1.0.0 ниже относятся только к историческому релизу.
+
+Для просмотра состава и публикации без дополнительных проверок используются:
+
+```sh
+flutter pub publish --dry-run --skip-validation
+flutter pub publish --force --skip-validation
+```
+
+`--skip-validation` отключает проверки pub и разрешение зависимостей; это осознанное ограничение данного релиза. Перед отправкой просматриваются список файлов и diff. После публикации нужно подтвердить версию через API pub.dev и сверить скачанный архив с checkout, включая все bundled-файлы и их SHA-256.
+
+## Публикация 1.0.1
+
+Публикация **завершена**: pub.dev принял `push_platform_flutter` **1.0.1**. Дополнительная авторизация не потребовалась. [API версии](https://pub.dev/api/packages/push_platform_flutter/versions/1.0.1) подтвердил версию; время публикации: **2026-10-24T09:50:42.726579Z**.
+
+[Опубликованный архив](https://pub.dev/api/archives/push_platform_flutter-1.0.1.tar.gz) скачан анонимно. SHA-256: `14876d4d5cd05786cbad4b975f9b898de00c49c349adbc46be4c1b2045a37ef6` — совпадает с API pub.dev. Все **69 файлов** архива побайтово совпадают с релизным checkout, включая 18 native Swift-файлов, LICENSE, lock и manifest. Скрипты, docs и внутренние материалы в архив не попали. Bundled-исходники и лицензия также побайтово сверены с зафиксированным upstream commit; их SHA-256 совпадают с manifest.
+
+Релизный commit: `7f3177f` (`fix: bundle iOS SDK for Flutter 1.0.1 [skip ci]`). Метка `[skip ci]` предотвращает автоматический запуск тестов при push. Отчёт о публикации записан отдельным commit; `docs/` исключён из pub-архива. Тег до merge не создаётся.
+
+Пакет: https://pub.dev/packages/push_platform_flutter/versions/1.0.1
+
+Создание PR: https://github.com/pushplatform/pushpilot-sdk-flutter/compare/main...release/flutter-1.0.1-bundled-ios?expand=1
+
+Тесты, анализатор, сборки, симуляторы и примеры для 1.0.1 не запускались. Успешная публикация и сверка архива не подтверждают работоспособность сборки.
+
+---
+
+# Исторический отчёт: 1.0.0
+
+Следующие сведения описывают предыдущую поставку через Trunk и её проверки, а не процедуру и результаты релиза 1.0.1. Для будущих релизов используется bundled-поставка выше.
+
 # Релиз PushPilot Flutter SDK 1.0.0
 
 Дата подготовки: 2026-10-12. Пакет: `push_platform_flutter` 1.0.0. Ветка: `release/flutter-1.0.0`. Работа выполняется только в репозитории `pushpilot-sdk-flutter`; merge выполняет владелец.
@@ -49,7 +112,7 @@ iOS: CocoaPod `PushPlatformSDK` **1.0.0**. В podspec плагина закре�
 
 Тег `v1.0.0` до merge не создаётся. После merge владелец может отметить объединённый релизный commit этим тегом; повторно публиковать 1.0.0 нельзя.
 
-## Следующий релиз
+## Историческая процедура после 1.0.0
 
 1. Создать отдельную release-ветку, обновить версии pubspec/podspec и CHANGELOG.
 2. Сверить реальные опубликованные нативные версии и публичные registry URLs.
