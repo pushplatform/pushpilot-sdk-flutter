@@ -43,7 +43,17 @@ flutter pub publish --force --skip-validation
 
 ## Публикация 1.0.1
 
-Подготовлена; результат публикации и сверки архива будет записан после загрузки на pub.dev. Ветка будет отправлена в origin; тег до merge не создаётся.
+Публикация **завершена**: pub.dev принял `push_platform_flutter` **1.0.1**. Дополнительная авторизация не потребовалась. [API версии](https://pub.dev/api/packages/push_platform_flutter/versions/1.0.1) подтвердил версию; время публикации: **2026-10-24T09:50:42.726579Z**.
+
+[Опубликованный архив](https://pub.dev/api/archives/push_platform_flutter-1.0.1.tar.gz) скачан анонимно. SHA-256: `14876d4d5cd05786cbad4b975f9b898de00c49c349adbc46be4c1b2045a37ef6` — совпадает с API pub.dev. Все **69 файлов** архива побайтово совпадают с релизным checkout, включая 18 native Swift-файлов, LICENSE, lock и manifest. Скрипты, docs и внутренние материалы в архив не попали. Bundled-исходники и лицензия также побайтово сверены с зафиксированным upstream commit; их SHA-256 совпадают с manifest.
+
+Релизный commit: `7f3177f` (`fix: bundle iOS SDK for Flutter 1.0.1 [skip ci]`). Метка `[skip ci]` предотвращает автоматический запуск тестов при push. Отчёт о публикации записан отдельным commit; `docs/` исключён из pub-архива. Тег до merge не создаётся.
+
+Пакет: https://pub.dev/packages/push_platform_flutter/versions/1.0.1
+
+Создание PR: https://github.com/pushplatform/pushpilot-sdk-flutter/compare/main...release/flutter-1.0.1-bundled-ios?expand=1
+
+Тесты, анализатор, сборки, симуляторы и примеры для 1.0.1 не запускались. Успешная публикация и сверка архива не подтверждают работоспособность сборки.
 
 ---
 
