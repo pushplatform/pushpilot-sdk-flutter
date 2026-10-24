@@ -1,0 +1,28 @@
+{
+  "repository": "https://github.com/pushplatform/pushpilot-sdk-ios.git",
+  "version": "1.0.0",
+  "tag": "v1.0.0",
+  "tag_object": "db4a57e9d8d2d3fcafc914bd2aa59cc99f9d5d4f",
+  "commit": "c67bcdf57ab150a5835570e4b695b173c1953bc1",
+  "sha256": {
+    "LICENSE": "a9a75351793a2d1de9a5aa69c7732663e1e7f842dca4ddd412729de3924ac0c4",
+    "Sources/PushPlatformSDK/Configuration.swift": "0b1e8688fd235c1bb87198faf86733cc79835641b7ff21c309b7af3ec796e747",
+    "Sources/PushPlatformSDK/Core/APIClient.swift": "7a03fa91c4cd9b37a8fcc2ebeb934ace583662c28bba5bfff676b08156180564",
+    "Sources/PushPlatformSDK/Core/InstallationManager.swift": "e7ef63acb729de54adf97a0c6b9b2defb904fc848f71e4cf529f43f2223d2f04",
+    "Sources/PushPlatformSDK/Core/SecureStorage.swift": "5c2e3260f277c6de22f75a9241b4faa1317f02d12c38f46478597b577d4ee96a",
+    "Sources/PushPlatformSDK/Core/SecureStorageProtocol.swift": "da233744a2a632d331a0818758eafd6c197fa08fde7a6d1a7ad8755090ae00c8",
+    "Sources/PushPlatformSDK/Core/UserManager.swift": "27beb1dfd8f0494ee39175d58d09b5a3ef0471ca3264e5b6525116ce38e6b0f1",
+    "Sources/PushPlatformSDK/Models/Installation.swift": "29480912faaa6346f2c5036ec37442b360faaf88fddc1d9d33f6c7f0b74866e8",
+    "Sources/PushPlatformSDK/Models/SDKError.swift": "864cc9b5e7803d03ed9fbc1bdc829510e019cb40f6b4e98b5b4a66c55359f2ad",
+    "Sources/PushPlatformSDK/Notifications/CallKitIntegration.swift": "094b22a1ea8956ecc1c43831a7bc34ecba08505847adbed0ad6a1b8fafb3865b",
+    "Sources/PushPlatformSDK/Notifications/DeduplicationCache.swift": "898a6d4ffdaabd4a429e2bbc8b209a683a80312ffa62c0c97ee6cea122950a95",
+    "Sources/PushPlatformSDK/Notifications/NotificationDelegate.swift": "24f48d9bb9f4aa94e275c6d08caafc0e810d00867f278c893b8222e1a3547e5d",
+    "Sources/PushPlatformSDK/Notifications/NotificationParser.swift": "f05b75c23e5d8a706bf02ebe1ee2158e254af84db2e470cd2148d57e45198881",
+    "Sources/PushPlatformSDK/PushPlatform.swift": "73f2ba25a71ea7aad98a940ae65a45cd9b8e975057a0279ed517af8d82e5fe2c",
+    "Sources/PushPlatformSDK/Tokens/APNsTokenManager.swift": "cf599e2a0f8af0ec3d821b9fbe6abca24b902031ba4d41b8cde05bddfdfe55f5",
+    "Sources/PushPlatformSDK/Tokens/PushKitManager.swift": "7d9a9aa6902fa7d679688633142fdea93d16eb2d251f80efa2a5e74fc675be07",
+    "Sources/PushPlatformSDK/Tokens/TokenRegistry.swift": "363c9a9846e57360b41e7df0ad69e8e88f7febb1f3dc1922508a336e2501ce8d",
+    "Sources/PushPlatformSDK/Utilities/Logger.swift": "3cc5acdd5a940e2c0fae1763a000f74b3899193778f00c06e40cede41c48e493",
+    "Sources/PushPlatformSDK/Utilities/Reachability.swift": "38a74394e4de4d50c68f0ae659e79c3a3d1d16c02b58ac3e9493084f792b6229"
+  }
+}

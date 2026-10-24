@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-import PushPlatformSDK
+// PushPlatformSDK sources are bundled and compiled in this plugin's module.
 import UserNotifications
 
 /// Flutter plugin for Push Platform iOS SDK
