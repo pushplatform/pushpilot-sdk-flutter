@@ -1,3 +1,14 @@
+# Patch 1.0.2 — Android initial FCM token
+
+Branch: `release/flutter-fcm-1.0.2`. Android dependency updates to the public immutable `com.pushplatform:sdk-android:1.0.1`. The Dart API and Android bridge stay unchanged. The iOS sources, license, lock and manifest are byte-for-byte unchanged; only the Flutter podspec package version advances to 1.0.2.
+
+Native regression verification: the new existing-token test fails on 1.0.0; eight initial-token/race/error/scope cases plus eight FcmTokenManager tests pass on 1.0.1. Real HTTP payloads are inspected through MockWebServer. No manual token API workaround remains in the normal integration.
+
+Publication uses normal `flutter pub publish` validation, followed by anonymous pub.dev archive/hash verification and an Android consumer of the published dependency. No unrelated console/owner E2E, physical push or iOS build is repeated. Publication and consumer results will be appended.
+
+---
+Historical reports follow.
+
 # Релиз PushPilot Flutter SDK 1.0.1
 
 Дата подготовки: 2026-10-24. Пакет: `push_platform_flutter` 1.0.1; patch относительно опубликованной на pub.dev версии 1.0.0. Ветка: `release/flutter-1.0.1-bundled-ios`. Merge выполняет владелец.
