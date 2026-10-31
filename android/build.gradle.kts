@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pushplatform.flutter"
-version = "1.0.0"
+version = "1.0.2"
 
 repositories {
     google()
@@ -43,7 +43,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("com.pushplatform:sdk-android:1.0.0")
+    implementation("com.pushplatform:sdk-android:1.0.1")
 
     // Test dependencies
     testImplementation("junit:junit:4.13.2")

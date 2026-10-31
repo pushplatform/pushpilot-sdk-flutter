@@ -1,13 +1,13 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.0.1** подключает Android SDK PushPilot **1.0.0** и включает исходники iOS SDK **1.0.0** в pub-пакет. Доступны регистрация installation, привязка пользователя, разрешения на уведомления и потоки событий. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.0.2** подключает Android SDK PushPilot **1.0.1** и включает исходники iOS SDK **1.0.0** в pub-пакет. Доступны регистрация installation, привязка пользователя, разрешения на уведомления и потоки событий. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
-Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/release/flutter-1.0.1-bundled-ios/docs/RELEASING.md).
+Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/release/flutter-fcm-1.0.2/docs/RELEASING.md).
 
 ```sh
-flutter pub add push_platform_flutter:^1.0.1
+flutter pub add push_platform_flutter:^1.0.2
 ```
 
 Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
@@ -16,12 +16,12 @@ flutter pub add push_platform_flutter:^1.0.1
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: ^1.0.1
+  push_platform_flutter: ^1.0.2
 ```
 
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
-- Android: `com.pushplatform:sdk-android:1.0.0` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
+- Android: `com.pushplatform:sdk-android:1.0.1` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
 - iOS: исходники `PushPlatformSDK` **1.0.0** из опубликованного тега `v1.0.0` (commit `c67bcdf57ab150a5835570e4b695b173c1953bc1`) находятся в `ios/Bundled/PushPlatformSDK` вместе с MIT-лицензией и manifest с SHA-256 файлов. Podspec компилирует их внутри Flutter-плагина. Отдельная строка `pod`, Git dependency, соседний репозиторий и ручное подключение native SDK не нужны.
 
 CocoaPods по-прежнему используется для интеграции Flutter. Зависимость от отдельного pod `PushPlatformSDK` удалена: публикация нашего native SDK в CocoaPods Trunk для будущих Flutter-релизов больше не нужна. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены.
@@ -134,9 +134,9 @@ class _PushDemoState extends State<PushDemo> {
 - `userId` возвращает `null` на обеих платформах; храните текущего пользователя в приложении. Аргумент `metadata` у `login` оставлен для совместимости и не передаётся нативными SDK 1.0.0.
 - Dart-потоки работают при активном Flutter engine. Фоновый Dart isolate, воспроизведение пропущенных событий и отдельный поток нажатий не реализованы. На iOS получение и нажатие приходят в `onPushReceived`; на Android отдельного callback открытия нет.
 - Silent push не гарантирует запуск Dart-кода в фоне. Доставка зависит от FCM/APNs, разрешений и ограничений ОС.
-- Нативный Android SDK 1.0.0 регистрирует FCM-токен при `onNewToken` после настройки SDK; автоматическая повторная отправка уже существующего токена при `configure` не реализована. В запросе токена SDK использует фиксированный bundle ID `com.pushplatform.sdk`. Эти ограничения нужно учесть при оценке реальной доставки.
+- Android SDK 1.0.1 автоматически получает текущий FCM-токен при `initialize`, дожидается backend installation и регистрирует токен с environment и package name приложения. Ранние callback и ротация обрабатываются штатно, ручной вызов API не нужен. Поток состояния `registered` означает подтверждение backend; токен не передаётся в Dart.
 - Событие звонка не предоставляет аудиотранспорт или управление разговором. Полноэкранный интерфейс звонка на Android этот Flutter API не настраивает. iOS SDK автоматически создаёт PushKit/CallKit; `registerForVoIP()` — совместимый no-op, публичного переключателя VoIP нет.
 - Повторные попытки сетевых операций и дедупликация выполняются нативными SDK. Их очереди и кеши имеют ограничения; первоначальная регистрация не получает автоматических повторов на уровне Dart.
-- `debugMode` предназначен для разработки: нативные логи могут содержать пользовательские идентификаторы. Для релиза 1.0.1 просмотрены diff и состав pub-пакета; тесты, сборки, симуляторы и примеры не запускались.
+- `debugMode` предназначен для разработки: нативные логи могут содержать пользовательские идентификаторы. Исправление первичной регистрации проверено 16 целевыми native-тестами с Firebase task и MockWebServer; физическая FCM-доставка требует Firebase-конфигурации и контролируемого устройства.
 
-[Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/release/flutter-1.0.1-bundled-ios/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
+[Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/release/flutter-fcm-1.0.2/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.

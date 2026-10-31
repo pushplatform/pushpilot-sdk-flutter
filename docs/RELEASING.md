@@ -1,3 +1,14 @@
+# Patch 1.0.2 — Android initial FCM token
+
+Branch: `release/flutter-fcm-1.0.2`. Android dependency updates to the public immutable `com.pushplatform:sdk-android:1.0.1`. The Dart API and Android bridge stay unchanged. The iOS sources, license, lock and manifest are byte-for-byte unchanged; only the Flutter podspec package version advances to 1.0.2.
+
+Native regression verification: the new existing-token test fails on 1.0.0; eight initial-token/race/error/scope cases plus eight FcmTokenManager tests pass on 1.0.1. Real HTTP payloads are inspected through MockWebServer. No manual token API workaround remains in the normal integration.
+
+Publication uses normal `flutter pub publish` validation, followed by anonymous pub.dev archive/hash verification and an Android consumer of the published dependency. No unrelated console/owner E2E, physical push or iOS build is repeated. Published to pub.dev on 2026-10-31 (`1.0.2` API timestamp `2026-10-31T11:13:01.743863Z`). The anonymous public archive SHA-256 is `7af1772d2e464d80b4d3a4c84462ab0e57b7ab12b18f697fd1cd05a251ffd63f`, equal to the pub.dev API value. All 69 archive files are byte-for-byte equal to the release checkout. Normal validation was used (no skip-validation). A fresh generated Android consumer installed 1.0.2 directly from pub.dev with an isolated pub cache, then built a debug APK successfully in 24.7s. The APK contains `com.pushplatform.sdk.core.FcmRegistration` from the patched Android dependency. The application was not installed or run; no real push or API call occurred. Initial dependency resolution briefly saw the old pub.dev index; it succeeded after the public index exposed 1.0.2. Compiler notices about future Flutter built-in Kotlin migration are separate from this FCM patch; this current consumer build succeeds.
+
+---
+Historical reports follow.
+
 # Релиз PushPilot Flutter SDK 1.0.1
 
 Дата подготовки: 2026-10-24. Пакет: `push_platform_flutter` 1.0.1; patch относительно опубликованной на pub.dev версии 1.0.0. Ветка: `release/flutter-1.0.1-bundled-ios`. Merge выполняет владелец.
