@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initialize() async {
     try {
-      await _sdk.initialize(InitializeOptions(
+      await _sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.staging.pushplatform.example',
         environment: 'development',

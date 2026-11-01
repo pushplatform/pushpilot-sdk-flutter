@@ -9,7 +9,7 @@ void main() {
     final sdk = PushPlatformFlutter.instance;
 
     testWidgets('initialize SDK with valid configuration', (tester) async {
-      await sdk.initialize(InitializeOptions(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.test.pushplatform.example',
         environment: 'development',
@@ -23,7 +23,7 @@ void main() {
     });
 
     testWidgets('login with userId after initialization', (tester) async {
-      await sdk.initialize(InitializeOptions(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.your-company.example',
         environment: 'development',
@@ -36,7 +36,7 @@ void main() {
     });
 
     testWidgets('logout clears user session', (tester) async {
-      await sdk.initialize(InitializeOptions(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.your-company.example',
         environment: 'development',
@@ -54,7 +54,7 @@ void main() {
     });
 
     testWidgets('deviceId remains stable across login/logout', (tester) async {
-      await sdk.initialize(InitializeOptions(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.your-company.example',
         environment: 'development',
@@ -73,7 +73,7 @@ void main() {
     });
 
     testWidgets('requestPermissions returns result', (tester) async {
-      await sdk.initialize(InitializeOptions(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.your-company.example',
         environment: 'development',

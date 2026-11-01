@@ -10,7 +10,7 @@ void main() {
     final sdk = PushPlatformFlutter.instance;
 
     setUp(() async {
-      await sdk.initialize(InitializeOptions(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.your-company.example',
         environment: 'development',

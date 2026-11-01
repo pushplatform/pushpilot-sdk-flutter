@@ -57,7 +57,7 @@ class _VerificationAppState extends State<VerificationApp> {
     _log('Step 2: Initialize SDK');
     final initStart = DateTime.now();
     try {
-      await _sdk.initialize(InitializeOptions(
+      await _sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
         url: 'https://api.test.pushplatform.example',
         environment: 'development',
