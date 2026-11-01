@@ -10,13 +10,12 @@ void main() {
     final sdk = PushPlatformFlutter.instance;
 
     setUp(() async {
-      await sdk.initialize(
+      await sdk.initialize(InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'integration-test-key',
+        url: 'https://api.your-company.example',
         environment: 'development',
         debugMode: true,
-      );
+      ));
     });
 
     group('iOS-specific', () {

@@ -57,13 +57,12 @@ class _VerificationAppState extends State<VerificationApp> {
     _log('Step 2: Initialize SDK');
     final initStart = DateTime.now();
     try {
-      await _sdk.initialize(
+      await _sdk.initialize(InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiKey: 'test-api-key-flutter',
-        apiBaseURL: 'https://api.test.pushplatform.example',
+        url: 'https://api.test.pushplatform.example',
         environment: 'development',
         debugMode: true,
-      );
+      ));
       final initDuration = DateTime.now().difference(initStart).inMilliseconds;
       _log('✅ initialize() succeeded (${initDuration}ms)');
     } catch (e) {

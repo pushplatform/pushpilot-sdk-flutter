@@ -40,18 +40,16 @@ void main() {
     });
 
     test('initialize() calls platform with correct arguments', () async {
-      await sdk.initialize(
+      await sdk.initialize(InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiKey: 'test-key',
-        apiBaseURL: 'https://api.test',
+        url: 'https://api.test',
         environment: 'development',
         debugMode: true,
-      );
+      ));
 
       expect(log.length, 1);
       expect(log[0].method, 'initialize');
-      expect(log[0].arguments['apiKey'], 'test-key');
-      expect(log[0].arguments['apiBaseURL'], 'https://api.test');
+      expect(log[0].arguments['url'], 'https://api.test');
       expect(log[0].arguments['applicationId'],
           '11111111-1111-1111-1111-111111111111');
       expect(log[0].arguments['environment'], 'development');
@@ -59,19 +57,18 @@ void main() {
     });
 
     test('initialize() defaults debugMode to false', () async {
-      await sdk.initialize(
+      await sdk.initialize(InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'test-key',
+        url: 'https://api.your-company.example',
         environment: 'production',
-      );
+      ));
 
       expect(log.length, 1);
       expect(log[0].arguments['debugMode'], false);
     });
 
     test('initialize() omits optional environment for native APNs detection', () async {
-      await sdk.initialize(applicationId: '11111111-1111-1111-1111-111111111111', apiKey: 'shared-app-key', apiBaseURL: 'https://api.test');
+      await sdk.initialize(InitializeOptions(applicationId: '11111111-1111-1111-1111-111111111111',  url: 'https://api.test'));
       expect(log.single.arguments.containsKey('environment'), false);
       expect(log.single.arguments['applicationId'], '11111111-1111-1111-1111-111111111111');
     });
@@ -126,11 +123,10 @@ void main() {
       });
 
       expect(
-        () => sdk.initialize(
+        () => sdk.initialize(InitializeOptions(
             applicationId: '11111111-1111-1111-1111-111111111111',
-            apiBaseURL: 'https://api.your-company.example',
-            apiKey: 'bad-key',
-            environment: 'production'),
+            url: 'https://api.your-company.example',
+            environment: 'production')),
         throwsA(isA<PlatformException>()),
       );
     });

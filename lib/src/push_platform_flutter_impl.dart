@@ -6,6 +6,20 @@ import 'models/state_change.dart';
 ///
 /// This is a thin wrapper over native iOS/Android SDKs.
 /// All business logic, retry, and deduplication happen in the native layer.
+class InitializeOptions {
+  final String applicationId;
+  final String? url;
+  final String? environment;
+  final bool debugMode;
+
+  const InitializeOptions({
+    required this.applicationId,
+    this.url,
+    this.environment,
+    this.debugMode = false,
+  });
+}
+
 class PushPlatformFlutter {
   static PushPlatformFlutter? _instance;
 
@@ -31,31 +45,24 @@ class PushPlatformFlutter {
   Stream<PushMessage>? _onPushReceived;
   Stream<StateChange>? _onStateChange;
 
-  /// Initialize the SDK
-  ///
-  /// Must be called before any other SDK methods.
-  ///
-  /// [apiKey] - API key from push-platform dashboard (devices:write scope)
-  /// [apiBaseURL] - URL of your PushPilot API.
-  /// [applicationId] - PushPilot application UUID, not the bundle/package ID.
-  /// [environment] - Environment name ('production' or 'development')
-  /// [debugMode] - Enable verbose logging (default: false)
-  ///
-  /// Throws [PlatformException] on initialization failure.
-  Future<void> initialize({
-    required String apiKey,
-    required String apiBaseURL,
-    required String applicationId,
-    String? environment,
-    bool debugMode = false,
-  }) async {
-    final args = {
-      'apiKey': apiKey,
-      'apiBaseURL': apiBaseURL,
-      'applicationId': applicationId,
-      if (environment != null) 'environment': environment,
-      'debugMode': debugMode,
-    };
+  /// Initialize with an application id, or with `{applicationId, url, environment}`.
+  /// A string uses https://api.pushpilot.ru and omits environment.
+  /// A url without environment registers the installation as development.
+  /// A second call returns success.
+  Future<void> initialize(Object config) async {
+    final Map<String, dynamic> args;
+    if (config is String) {
+      args = {'applicationId': config};
+    } else if (config is InitializeOptions) {
+      args = {
+        'applicationId': config.applicationId,
+        if (config.url != null) 'url': config.url,
+        if (config.environment != null) 'environment': config.environment,
+        'debugMode': config.debugMode,
+      };
+    } else {
+      throw ArgumentError('initialize expects an application id or InitializeOptions');
+    }
     await _methodChannel.invokeMethod('initialize', args);
   }
 

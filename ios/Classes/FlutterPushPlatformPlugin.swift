@@ -1,7 +1,7 @@
 import Flutter
 import UIKit
-// PushPlatformSDK sources are bundled and compiled in this plugin's module.
 import UserNotifications
+import PushPlatformSDK
 
 /// Flutter plugin for Push Platform iOS SDK
 ///
@@ -78,52 +78,25 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
 
     private func handleInitialize(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
-              let apiKey = args["apiKey"] as? String else {
-            result(FlutterError(
-                code: "INVALID_ARGUMENTS",
-                message: "Missing required argument: apiKey",
-                details: nil
-            ))
-            return
-        }
-
-        guard let apiBaseURL = args["apiBaseURL"] as? String,
-              let applicationId = args["applicationId"] as? String,
-              let applicationID = UUID(uuidString: applicationId) else {
-            result(FlutterError(code: "INVALID_ARGUMENTS", message: "apiBaseURL and a UUID applicationId are required", details: nil))
+              let applicationId = args["applicationId"] as? String else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", message: "applicationId is required", details: nil))
             return
         }
         let debugMode = args["debugMode"] as? Bool ?? false
-
-        // Map environment string to SDK enum
-        let environment: Environment
-        switch (args["environment"] as? String)?.lowercased() {
-        case nil:
-            environment = .automatic
-        case "production":
-            environment = .production
-        case "development", "sandbox":
-            environment = .development
-        default:
-            result(FlutterError(
-                code: "INVALID_ARGUMENTS",
-                message: "Invalid environment. Use 'production' or 'development'.",
-                details: nil
-            ))
-            return
+        var options = PushPlatform.InitializeOptions(applicationId: applicationId, url: args["url"] as? String, debugMode: debugMode)
+        if let name = (args["environment"] as? String)?.lowercased() {
+            switch name {
+            case "production": options.environment = .production
+            case "development", "sandbox": options.environment = .development
+            default:
+                result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid environment. Use 'production' or 'development'.", details: nil))
+                return
+            }
         }
 
-        // Initialize native SDK
         sdk = PushPlatform.shared
         sdk?.delegate = self
-
-        sdk?.configure(
-            apiKey: apiKey,
-            apiBaseURL: apiBaseURL,
-            environment: environment,
-            debugMode: debugMode,
-            applicationID: applicationID
-        ) { configurationResult in
+        sdk?.initialize(options) { configurationResult in
             switch configurationResult {
             case .success:
                 result(nil)

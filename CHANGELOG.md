@@ -1,3 +1,8 @@
+# 1.2.0 — 2026-11-01
+
+- `initialize` takes an application id or `{applicationId, url, environment}`. No API key and no `apiBaseURL`.
+- The plugin depends on the published iOS and Android SDKs.
+
 # 1.1.1 — 2026-11-01
 
 Documentation/packaging correction: README now identifies the bundled Android/iOS SDKs as 1.1.0 and the current shared application-key setup. Native runtime, dependencies and Dart/bridge behavior are unchanged from 1.1.0. No additional SDK builds are needed for this documentation patch.
