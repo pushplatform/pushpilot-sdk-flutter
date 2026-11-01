@@ -124,10 +124,10 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         }
 
         val apiKey = args["apiKey"] as? String
-        val environmentStr = args["environment"] as? String
+        val environmentStr = args["environment"] as? String ?: "production"
 
-        if (apiKey == null || environmentStr == null) {
-            result.error("INVALID_ARGUMENTS", "Missing required arguments: apiKey, environment", null)
+        if (apiKey == null) {
+            result.error("INVALID_ARGUMENTS", "Missing required argument: apiKey", null)
             return
         }
 

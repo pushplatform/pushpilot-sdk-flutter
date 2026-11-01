@@ -78,11 +78,10 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
 
     private func handleInitialize(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
-              let apiKey = args["apiKey"] as? String,
-              let environmentStr = args["environment"] as? String else {
+              let apiKey = args["apiKey"] as? String else {
             result(FlutterError(
                 code: "INVALID_ARGUMENTS",
-                message: "Missing required arguments: apiKey, environment",
+                message: "Missing required argument: apiKey",
                 details: nil
             ))
             return
@@ -98,7 +97,9 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
 
         // Map environment string to SDK enum
         let environment: Environment
-        switch environmentStr.lowercased() {
+        switch (args["environment"] as? String)?.lowercased() {
+        case nil:
+            environment = .automatic
         case "production":
             environment = .production
         case "development", "sandbox":
@@ -106,7 +107,7 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
         default:
             result(FlutterError(
                 code: "INVALID_ARGUMENTS",
-                message: "Invalid environment: \(environmentStr). Use 'production' or 'development'.",
+                message: "Invalid environment. Use 'production' or 'development'.",
                 details: nil
             ))
             return
@@ -179,6 +180,7 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
                         } else {
                             self.stateEventSink?("permissionsDenied")
                         }
+                        self.sdk?.refreshMetadata()
                         result(granted)
                     }
                 }
