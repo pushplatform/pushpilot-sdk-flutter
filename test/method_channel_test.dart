@@ -70,6 +70,12 @@ void main() {
       expect(log[0].arguments['debugMode'], false);
     });
 
+    test('initialize() omits optional environment for native APNs detection', () async {
+      await sdk.initialize(applicationId: '11111111-1111-1111-1111-111111111111', apiKey: 'shared-app-key', apiBaseURL: 'https://api.test');
+      expect(log.single.arguments.containsKey('environment'), false);
+      expect(log.single.arguments['applicationId'], '11111111-1111-1111-1111-111111111111');
+    });
+
     test('requestPermissions() calls platform', () async {
       final result = await sdk.requestPermissions();
 

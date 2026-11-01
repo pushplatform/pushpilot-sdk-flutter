@@ -1,3 +1,14 @@
+# 1.1.1 — 2026-11-01
+
+Documentation/packaging correction: README now identifies the bundled Android/iOS SDKs as 1.1.0 and the current shared application-key setup. Native runtime, dependencies and Dart/bridge behavior are unchanged from 1.1.0. No additional SDK builds are needed for this documentation patch.
+
+# 1.1.0 — 2026-11-01
+
+- Unified application ID and permanent shared application key for SDK and server; no project/environment setup step.
+- Actual device kind, language, time zone, OS/SDK/app version and notification permission metadata. Unknown facts stay unknown.
+- Optional legacy environment compatibility; iOS defaults to build-entitlement APNs transport detection.
+- Test subscription remains a separate console marker.
+
 # История изменений
 
 ## 1.0.2 — 2026-10-31

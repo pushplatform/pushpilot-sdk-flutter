@@ -1,13 +1,13 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.0.2** подключает Android SDK PushPilot **1.0.1** и включает исходники iOS SDK **1.0.0** в pub-пакет. Доступны регистрация installation, привязка пользователя, разрешения на уведомления и потоки событий. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.1.1** подключает Android SDK PushPilot **1.1.0** и включает исходники iOS SDK **1.1.0** в pub-пакет. Доступны регистрация installation, привязка пользователя, разрешения на уведомления и потоки событий. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
-Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/release/flutter-fcm-1.0.2/docs/RELEASING.md).
+Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/main/docs/UNIFIED_APPLICATIONS.md).
 
 ```sh
-flutter pub add push_platform_flutter:^1.0.2
+flutter pub add push_platform_flutter:^1.1.1
 ```
 
 Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
@@ -16,13 +16,13 @@ flutter pub add push_platform_flutter:^1.0.2
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: ^1.0.2
+  push_platform_flutter: ^1.1.1
 ```
 
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
-- Android: `com.pushplatform:sdk-android:1.0.1` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
-- iOS: исходники `PushPlatformSDK` **1.0.0** из опубликованного тега `v1.0.0` (commit `c67bcdf57ab150a5835570e4b695b173c1953bc1`) находятся в `ios/Bundled/PushPlatformSDK` вместе с MIT-лицензией и manifest с SHA-256 файлов. Podspec компилирует их внутри Flutter-плагина. Отдельная строка `pod`, Git dependency, соседний репозиторий и ручное подключение native SDK не нужны.
+- Android: `com.pushplatform:sdk-android:1.1.0` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
+- iOS: исходники `PushPlatformSDK` **1.1.0** из опубликованного тега `v1.1.0` (commit `f04eaa4028d8f2d02c8bbecddec3084d84386295`) находятся в `ios/Bundled/PushPlatformSDK` вместе с MIT-лицензией и manifest с SHA-256 файлов. Podspec компилирует их внутри Flutter-плагина. Отдельная строка `pod`, Git dependency, соседний репозиторий и ручное подключение native SDK не нужны.
 
 CocoaPods по-прежнему используется для интеграции Flutter. Зависимость от отдельного pod `PushPlatformSDK` удалена: публикация нашего native SDK в CocoaPods Trunk для будущих Flutter-релизов больше не нужна. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены.
 
@@ -59,7 +59,7 @@ repositories {
 
 ## Минимальный пример
 
-Получите в PushPilot UUID приложения, URL своего API и клиентский SDK-ключ со scope `devices:write`. `applicationId` ниже — UUID приложения **PushPilot**, а не Android package name или iOS Bundle ID. Значения `.example` и `SDK_DEVICE_KEY` — заполнители; замените их своей конфигурацией. Серверный ключ отправки сообщений в мобильное приложение не добавляйте.
+Получите в PushPilot UUID приложения, URL своего API и общий бессрочный ключ приложения для SDK всех платформ и серверной отправки. `applicationId` ниже — UUID приложения **PushPilot**, а не Android package name или iOS Bundle ID. Значения `.example` и `APPLICATION_KEY` — заполнители; замените их своей конфигурацией. Общий ключ извлекаем из приложения и разрешает отправку только в этом приложении. Административные и приватные provider credentials остаются на сервере.
 
 ```dart
 import 'dart:async';
@@ -93,8 +93,7 @@ class _PushDemoState extends State<PushDemo> {
       await sdk.initialize(
         applicationId: '11111111-1111-1111-1111-111111111111',
         apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'SDK_DEVICE_KEY',
-        environment: 'development',
+        apiKey: 'APPLICATION_KEY',
       );
       final allowed = await sdk.requestPermissions();
       // Привязка пользователя необязательна.
@@ -140,3 +139,10 @@ class _PushDemoState extends State<PushDemo> {
 - `debugMode` предназначен для разработки: нативные логи могут содержать пользовательские идентификаторы. Исправление первичной регистрации проверено 16 целевыми native-тестами с Firebase task и MockWebServer; физическая FCM-доставка требует Firebase-конфигурации и контролируемого устройства.
 
 [Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/release/flutter-fcm-1.0.2/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
+
+
+### Unified applications · 1.1.0
+
+One PushPilot application contains iOS, Android and Web providers. Use the same application ID and permanent application key in SDKs and server code. The key is extractable from the client and allows sending only in that application; it cannot administer the organization or billing. Rotate/revoke it in the console.
+Omit `environment` during initialization. iOS derives APNs transport from the simulator/build entitlement; Android uses the unified registration scope. The optional legacy argument remains compatible.
+Native SDKs report actual model, OS/SDK/app version, language, time zone, permission and physical/simulator/emulator kind (unknown where unavailable). Test subscription is an independent console marker. Metadata refreshes on foreground and permission changes.

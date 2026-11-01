@@ -46,14 +46,14 @@ class PushPlatformFlutter {
     required String apiKey,
     required String apiBaseURL,
     required String applicationId,
-    required String environment,
+    String? environment,
     bool debugMode = false,
   }) async {
     final args = {
       'apiKey': apiKey,
       'apiBaseURL': apiBaseURL,
       'applicationId': applicationId,
-      'environment': environment,
+      if (environment != null) 'environment': environment,
       'debugMode': debugMode,
     };
     await _methodChannel.invokeMethod('initialize', args);
