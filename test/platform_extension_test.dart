@@ -57,12 +57,11 @@ void main() {
     group('Cross-platform methods always available', () {
       test('initialize works on any platform', () async {
         await expectLater(
-          sdk.initialize(
+          sdk.initialize(InitializeOptions(
             applicationId: '11111111-1111-1111-1111-111111111111',
-            apiBaseURL: 'https://api.your-company.example',
-            apiKey: 'test-key',
+            url: 'https://api.your-company.example',
             environment: 'development',
-          ),
+          )),
           completes,
         );
       });

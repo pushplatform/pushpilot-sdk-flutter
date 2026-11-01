@@ -9,13 +9,12 @@ void main() {
     final sdk = PushPlatformFlutter.instance;
 
     testWidgets('initialize SDK with valid configuration', (tester) async {
-      await sdk.initialize(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiKey: 'integration-test-key',
-        apiBaseURL: 'https://api.test.pushplatform.example',
+        url: 'https://api.test.pushplatform.example',
         environment: 'development',
         debugMode: true,
-      );
+      ));
 
       // Verify SDK is initialized by checking deviceId is available
       final deviceId = await sdk.deviceId;
@@ -24,12 +23,11 @@ void main() {
     });
 
     testWidgets('login with userId after initialization', (tester) async {
-      await sdk.initialize(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'integration-test-key',
+        url: 'https://api.your-company.example',
         environment: 'development',
-      );
+      ));
 
       await sdk.login(userId: 'integration-test-user');
 
@@ -38,12 +36,11 @@ void main() {
     });
 
     testWidgets('logout clears user session', (tester) async {
-      await sdk.initialize(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'integration-test-key',
+        url: 'https://api.your-company.example',
         environment: 'development',
-      );
+      ));
 
       await sdk.login(userId: 'integration-test-user');
 
@@ -57,12 +54,11 @@ void main() {
     });
 
     testWidgets('deviceId remains stable across login/logout', (tester) async {
-      await sdk.initialize(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'integration-test-key',
+        url: 'https://api.your-company.example',
         environment: 'development',
-      );
+      ));
 
       final deviceIdBefore = await sdk.deviceId;
 
@@ -77,12 +73,11 @@ void main() {
     });
 
     testWidgets('requestPermissions returns result', (tester) async {
-      await sdk.initialize(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'integration-test-key',
+        url: 'https://api.your-company.example',
         environment: 'development',
-      );
+      ));
 
       final granted = await sdk.requestPermissions();
       expect(granted, isA<bool>());

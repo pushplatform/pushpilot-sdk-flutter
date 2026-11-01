@@ -31,11 +31,10 @@ void main() {
         });
 
         expect(
-          () => sdk.initialize(
+          () => sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: 'bad-key',
-              environment: 'production'),
+              url: 'https://api.your-company.example',
+              environment: 'production')),
           throwsA(
             isA<PlatformException>().having(
               (e) => e.code,
@@ -145,11 +144,10 @@ void main() {
         });
 
         try {
-          await sdk.initialize(
+          await sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: 'test-key',
-              environment: 'production');
+              url: 'https://api.your-company.example',
+              environment: 'production'));
           fail('Should have thrown PlatformException');
         } on PlatformException catch (e) {
           expect(e.code, 'UNKNOWN_ERROR');
@@ -161,16 +159,8 @@ void main() {
     });
 
     group('Null and Empty Value Handling', () {
-      test('initialize throws on null apiKey', () {
-        expect(
-          () => sdk.initialize(
-            applicationId: '11111111-1111-1111-1111-111111111111',
-            apiBaseURL: 'https://api.your-company.example',
-            apiKey: null as dynamic,
-            environment: 'production',
-          ),
-          throwsA(isA<TypeError>()),
-        );
+      test('initialize throws on a value that is not an id or options', () {
+        expect(() => sdk.initialize(1), throwsArgumentError);
       });
 
       test('initialize throws on empty apiKey', () async {
@@ -183,11 +173,10 @@ void main() {
         });
 
         expect(
-          () => sdk.initialize(
+          () => sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: '',
-              environment: 'production'),
+              url: 'https://api.your-company.example',
+              environment: 'production')),
           throwsA(isA<PlatformException>()),
         );
       });
@@ -221,11 +210,10 @@ void main() {
         });
 
         await expectLater(
-          sdk.initialize(
+          sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: 'test-key',
-              environment: 'production'),
+              url: 'https://api.your-company.example',
+              environment: 'production')),
           completes,
         );
       });
@@ -261,11 +249,10 @@ void main() {
         });
 
         expect(
-          () => sdk.initialize(
+          () => sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: 'test-key',
-              environment: 'production'),
+              url: 'https://api.your-company.example',
+              environment: 'production')),
           throwsA(isA<MissingPluginException>()),
         );
       });
@@ -277,11 +264,10 @@ void main() {
         });
 
         expect(
-          () => sdk.initialize(
+          () => sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: 'test-key',
-              environment: 'production'),
+              url: 'https://api.your-company.example',
+              environment: 'production')),
           throwsException,
         );
       });
@@ -303,11 +289,10 @@ void main() {
 
         // First call should throw
         expect(
-          () => sdk.initialize(
+          () => sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: 'test-key',
-              environment: 'production'),
+              url: 'https://api.your-company.example',
+              environment: 'production')),
           throwsA(
             isA<PlatformException>().having(
               (e) => e.code,
@@ -319,11 +304,10 @@ void main() {
 
         // Second call should succeed
         await expectLater(
-          sdk.initialize(
+          sdk.initialize(InitializeOptions(
               applicationId: '11111111-1111-1111-1111-111111111111',
-              apiBaseURL: 'https://api.your-company.example',
-              apiKey: 'test-key',
-              environment: 'production'),
+              url: 'https://api.your-company.example',
+              environment: 'production')),
           completes,
         );
       });
@@ -342,12 +326,11 @@ void main() {
           return null;
         });
 
-        final initFuture = sdk.initialize(
+        final initFuture = sdk.initialize(InitializeOptions(
           applicationId: '11111111-1111-1111-1111-111111111111',
-          apiBaseURL: 'https://api.your-company.example',
-          apiKey: 'test-key',
+          url: 'https://api.your-company.example',
           environment: 'production',
-        );
+        ));
         final loginFuture =
             sdk.login(userId: 'user-123').catchError((e) => null);
 

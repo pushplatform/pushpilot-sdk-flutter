@@ -43,7 +43,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("com.pushplatform:sdk-android:1.1.0")
+    implementation("com.pushplatform:sdk-android:1.2.0")
 
     // Test dependencies
     testImplementation("junit:junit:4.13.2")

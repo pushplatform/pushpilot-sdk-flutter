@@ -10,13 +10,12 @@ void main() {
     final sdk = PushPlatformFlutter.instance;
 
     setUp(() async {
-      await sdk.initialize(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'integration-test-key',
+        url: 'https://api.your-company.example',
         environment: 'development',
         debugMode: true,
-      );
+      ));
     });
 
     testWidgets('onPushReceived stream emits events', (tester) async {
@@ -57,12 +56,11 @@ void main() {
         stateChanges.add(state);
       });
 
-      await sdk.initialize(
+      await sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiBaseURL: 'https://api.your-company.example',
-        apiKey: 'integration-test-key-2',
+        url: 'https://api.your-company.example',
         environment: 'development',
-      );
+      ));
 
       await Future.delayed(const Duration(milliseconds: 500));
 

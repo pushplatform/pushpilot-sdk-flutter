@@ -123,44 +123,31 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
             return
         }
 
-        val apiKey = args["apiKey"] as? String
-        val environmentStr = args["environment"] as? String ?: "production"
-
-        if (apiKey == null) {
-            result.error("INVALID_ARGUMENTS", "Missing required argument: apiKey", null)
-            return
-        }
-
-        val apiBaseURL = args["apiBaseURL"] as? String
         val applicationId = args["applicationId"] as? String
-        if (apiBaseURL.isNullOrBlank() || applicationId.isNullOrBlank()) {
-            result.error("INVALID_ARGUMENTS", "apiBaseURL and applicationId are required", null)
+        if (applicationId.isNullOrBlank()) {
+            result.error("INVALID_ARGUMENTS", "applicationId is required", null)
             return
         }
         val debugMode = args["debugMode"] as? Boolean ?: false
-
-        // Map environment string to SDK enum
-        val environment = when (environmentStr.lowercase()) {
+        val environment = when ((args["environment"] as? String)?.lowercase()) {
+            null -> null
             "production" -> Environment.PRODUCTION
             "development", "sandbox" -> Environment.DEVELOPMENT
             else -> {
-                result.error(
-                    "INVALID_ARGUMENTS",
-                    "Invalid environment: $environmentStr. Use 'production' or 'development'.",
-                    null
-                )
+                result.error("INVALID_ARGUMENTS", "Invalid environment. Use 'production' or 'development'.", null)
                 return
             }
         }
 
         try {
-            sdk.configure(
-                context = context,
-                apiKey = apiKey,
-                environment = environment,
-                debugMode = debugMode,
-                apiBaseUrl = apiBaseURL,
-                applicationId = applicationId
+            sdk.initialize(
+                context,
+                PushPlatform.InitializeOptions(
+                    applicationId = applicationId,
+                    url = args["url"] as? String,
+                    environment = environment,
+                    debugMode = debugMode
+                )
             ) { configurationResult ->
                 mainHandler.post {
                     configurationResult.fold(

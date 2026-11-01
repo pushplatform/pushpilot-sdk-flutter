@@ -82,13 +82,12 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initialize() async {
     try {
-      await _sdk.initialize(
+      await _sdk.initialize(const InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',
-        apiKey: 'demo-api-key',
-        apiBaseURL: 'https://api.staging.pushplatform.example',
+        url: 'https://api.staging.pushplatform.example',
         environment: 'development',
         debugMode: true,
-      );
+      ));
 
       final id = await _sdk.deviceId;
       setState(() {

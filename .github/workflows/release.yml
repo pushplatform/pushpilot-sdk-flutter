@@ -1,0 +1,30 @@
+name: flutter-sdk-release
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish push_platform_flutter to pub.dev
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  pub:
+    if: inputs.publish && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: Publish to pub.dev
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
+        run: |
+          mkdir -p "$HOME/.config/dart"
+          printf '%s' "$PUB_CREDENTIALS" > "$HOME/.config/dart/pub-credentials.json"
+          flutter pub publish --force
