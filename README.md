@@ -1,13 +1,13 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.0.2** подключает Android SDK PushPilot **1.0.1** и включает исходники iOS SDK **1.0.0** в pub-пакет. Доступны регистрация installation, привязка пользователя, разрешения на уведомления и потоки событий. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.1.1** подключает Android SDK PushPilot **1.1.0** и включает исходники iOS SDK **1.1.0** в pub-пакет. Доступны регистрация installation, привязка пользователя, разрешения на уведомления и потоки событий. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
-Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/release/flutter-fcm-1.0.2/docs/RELEASING.md).
+Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/main/docs/UNIFIED_APPLICATIONS.md).
 
 ```sh
-flutter pub add push_platform_flutter:^1.1.0
+flutter pub add push_platform_flutter:^1.1.1
 ```
 
 Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
@@ -16,13 +16,13 @@ flutter pub add push_platform_flutter:^1.1.0
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: ^1.1.0
+  push_platform_flutter: ^1.1.1
 ```
 
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
-- Android: `com.pushplatform:sdk-android:1.0.1` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
-- iOS: исходники `PushPlatformSDK` **1.0.0** из опубликованного тега `v1.0.0` (commit `c67bcdf57ab150a5835570e4b695b173c1953bc1`) находятся в `ios/Bundled/PushPlatformSDK` вместе с MIT-лицензией и manifest с SHA-256 файлов. Podspec компилирует их внутри Flutter-плагина. Отдельная строка `pod`, Git dependency, соседний репозиторий и ручное подключение native SDK не нужны.
+- Android: `com.pushplatform:sdk-android:1.1.0` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
+- iOS: исходники `PushPlatformSDK` **1.1.0** из опубликованного тега `v1.1.0` (commit `f04eaa4028d8f2d02c8bbecddec3084d84386295`) находятся в `ios/Bundled/PushPlatformSDK` вместе с MIT-лицензией и manifest с SHA-256 файлов. Podspec компилирует их внутри Flutter-плагина. Отдельная строка `pod`, Git dependency, соседний репозиторий и ручное подключение native SDK не нужны.
 
 CocoaPods по-прежнему используется для интеграции Flutter. Зависимость от отдельного pod `PushPlatformSDK` удалена: публикация нашего native SDK в CocoaPods Trunk для будущих Flutter-релизов больше не нужна. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены.
 
