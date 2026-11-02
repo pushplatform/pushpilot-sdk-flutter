@@ -19,6 +19,11 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
     fileprivate var pushEventSink: FlutterEventSink?
     fileprivate var voipEventSink: FlutterEventSink?
     fileprivate var stateEventSink: FlutterEventSink?
+    fileprivate var openedEventSink: FlutterEventSink?
+    fileprivate var willDisplayEventSink: FlutterEventSink?
+    fileprivate var tokenEventSink: FlutterEventSink?
+    fileprivate var willDisplayObserved = false
+    private var pendingDisplays: [String: NotificationDisplayEvent] = [:]
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let methodChannel = FlutterMethodChannel(
@@ -45,6 +50,9 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
         pushEventChannel.setStreamHandler(PushEventStreamHandler(instance))
         voipEventChannel.setStreamHandler(VoIPEventStreamHandler(instance))
         stateEventChannel.setStreamHandler(StateEventStreamHandler(instance))
+        FlutterEventChannel(name: "com.pushplatform/notification_opened", binaryMessenger: registrar.messenger()).setStreamHandler(OpenedEventStreamHandler(instance))
+        FlutterEventChannel(name: "com.pushplatform/notification_will_display", binaryMessenger: registrar.messenger()).setStreamHandler(WillDisplayEventStreamHandler(instance))
+        FlutterEventChannel(name: "com.pushplatform/token_events", binaryMessenger: registrar.messenger()).setStreamHandler(TokenEventStreamHandler(instance))
 
         instance.methodChannel = methodChannel
         instance.pushEventChannel = pushEventChannel
@@ -66,6 +74,16 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             handleRegisterVoIP(result: result)
         case "getDeviceId":
             result(sdk?.getInstallationID()?.uuidString)
+        case "getDeviceToken":
+            result(sdk?.getDeviceToken())
+        case "getPermissionStatus":
+            handlePermissionStatus(result: result)
+        case "setNotificationWillDisplayObserved":
+            willDisplayObserved = call.arguments as? Bool ?? false
+            result(nil)
+        case "completeNotificationDisplay":
+            completeDisplay(call)
+            result(nil)
         case "getUserId":
             // UserManager doesn't expose userId getter - returning nil
             result(nil)
@@ -80,6 +98,10 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
         guard let args = call.arguments as? [String: Any],
               let applicationId = args["applicationId"] as? String else {
             result(FlutterError(code: "INVALID_ARGUMENTS", message: "applicationId is required", details: nil))
+            return
+        }
+        if args["apiBaseURL"] != nil && args["url"] == nil {
+            result(FlutterError(code: "INVALID_ARGUMENTS", message: "url is required", details: nil))
             return
         }
         let debugMode = args["debugMode"] as? Bool ?? false
@@ -167,6 +189,32 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
         }
     }
 
+    private func handlePermissionStatus(result: @escaping FlutterResult) {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let status: String
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                status = "granted"
+            case .denied:
+                status = "denied"
+            case .notDetermined:
+                status = "not-determined"
+            @unknown default:
+                status = "not-determined"
+            }
+            DispatchQueue.main.async { result(status) }
+        }
+    }
+
+    private func completeDisplay(_ call: FlutterMethodCall) {
+        guard let args = call.arguments as? [String: Any], let id = args["id"] as? String else { return }
+        guard let event = pendingDisplays.removeValue(forKey: id) else { return }
+        if args["prevented"] as? Bool == true {
+            event.preventDefault()
+        }
+        event.finish()
+    }
+
     private func handleLogin(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let sdk = sdk else {
             result(FlutterError(
@@ -187,7 +235,7 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        sdk.login(userID: userId) { loginResult in
+        sdk.login(userID: userId, metadata: args["metadata"] as? [String: Any]) { loginResult in
             DispatchQueue.main.async {
                 switch loginResult {
                 case .success:
@@ -271,9 +319,7 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
         if let body = notification.body {
             dict["body"] = body
         }
-        if let eventID = notification.eventID {
-            dict["messageId"] = eventID
-        }
+        dict["messageId"] = notification.eventID ?? notification.callID ?? "notification"
 
         // Sanitize customData for JSON serialization
         dict["data"] = sanitizeForJSON(notification.customData)
@@ -365,9 +411,22 @@ extension FlutterPushPlatformPlugin: PushPlatformDelegate {
     }
 
     public func didOpenNotification(_ notification: ParsedNotification, action: String?, context: NotificationContext) {
-        // Notification opened - same as received for Flutter layer
-        let payload = serializeNotification(notification)
-        pushEventSink?(payload)
+        openedEventSink?(serializeNotification(notification))
+    }
+
+    public func notificationWillDisplay(_ event: NotificationDisplayEvent) {
+        guard willDisplayObserved else { return }
+        let displayId = UUID().uuidString
+        pendingDisplays[displayId] = event
+        event.deferDecision()
+        willDisplayEventSink?([
+            "id": displayId,
+            "notification": serializeNotification(event.notification)
+        ])
+    }
+
+    public func didUpdateDeviceToken(_ token: String) {
+        tokenEventSink?(token)
     }
 
     public func didReceiveIncomingCall(callID: String, callerName: String, metadata: [String: Any]) {
@@ -378,8 +437,9 @@ extension FlutterPushPlatformPlugin: PushPlatformDelegate {
     // SECURITY: Token methods are NEVER exposed to Dart
     // Token registration happens entirely in the native SDK
     public func didUpdateAPNsToken() {
-        // Token sent to backend by native SDK
-        // NOT forwarded to Dart
+        if let token = sdk?.getDeviceToken() {
+            tokenEventSink?(token)
+        }
     }
 
     public func didUpdateVoIPToken() {
@@ -422,6 +482,47 @@ class VoIPEventStreamHandler: NSObject, FlutterStreamHandler {
 
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
         plugin?.voipEventSink = nil
+        return nil
+    }
+}
+
+class OpenedEventStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: FlutterPushPlatformPlugin?
+    init(_ plugin: FlutterPushPlatformPlugin) { self.plugin = plugin }
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        plugin?.openedEventSink = events
+        return nil
+    }
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        plugin?.openedEventSink = nil
+        return nil
+    }
+}
+
+class WillDisplayEventStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: FlutterPushPlatformPlugin?
+    init(_ plugin: FlutterPushPlatformPlugin) { self.plugin = plugin }
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        plugin?.willDisplayEventSink = events
+        plugin?.willDisplayObserved = true
+        return nil
+    }
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        plugin?.willDisplayEventSink = nil
+        plugin?.willDisplayObserved = false
+        return nil
+    }
+}
+
+class TokenEventStreamHandler: NSObject, FlutterStreamHandler {
+    weak var plugin: FlutterPushPlatformPlugin?
+    init(_ plugin: FlutterPushPlatformPlugin) { self.plugin = plugin }
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        plugin?.tokenEventSink = events
+        return nil
+    }
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        plugin?.tokenEventSink = nil
         return nil
     }
 }

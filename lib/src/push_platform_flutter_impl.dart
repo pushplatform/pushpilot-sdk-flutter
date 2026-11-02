@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'models/push_message.dart';
 import 'models/state_change.dart';
+import 'notification_display.dart';
+
+export 'notification_display.dart';
 
 /// Main SDK class for Push Platform Flutter
 ///
@@ -40,10 +45,21 @@ class PushPlatformFlutter {
       EventChannel('com.pushplatform/push_events');
   static const EventChannel _stateEventChannel =
       EventChannel('com.pushplatform/state_events');
+  static const EventChannel _openedEventChannel =
+      EventChannel('com.pushplatform/notification_opened');
+  static const EventChannel _willDisplayEventChannel =
+      EventChannel('com.pushplatform/notification_will_display');
+  static const EventChannel _tokenEventChannel =
+      EventChannel('com.pushplatform/token_events');
 
   // Lazy-initialized streams
   Stream<PushMessage>? _onPushReceived;
+  Stream<PushMessage>? _onNotificationOpened;
+  Stream<NotificationDisplayEvent>? _onNotificationWillDisplay;
+  Stream<String>? _onPushToken;
   Stream<StateChange>? _onStateChange;
+  StreamController<NotificationDisplayEvent>? _displayController;
+  StreamSubscription<dynamic>? _displaySource;
 
   /// Initialize with an application id, or with `{applicationId, url, environment}`.
   /// A string uses https://api.pushpilot.ru and omits environment.
@@ -60,8 +76,22 @@ class PushPlatformFlutter {
         if (config.environment != null) 'environment': config.environment,
         'debugMode': config.debugMode,
       };
+    } else if (config is Map) {
+      final applicationId = config['applicationId'];
+      if (applicationId is! String || applicationId.isEmpty) {
+        throw ArgumentError('applicationId is required');
+      }
+      if (config['apiBaseURL'] != null && config['url'] == null) {
+        throw ArgumentError('url is required');
+      }
+      args = {
+        'applicationId': applicationId,
+        if (config['url'] != null) 'url': config['url'],
+        if (config['environment'] != null) 'environment': config['environment'],
+        'debugMode': config['debugMode'] == true,
+      };
     } else {
-      throw ArgumentError('initialize expects an application id or InitializeOptions');
+      throw ArgumentError('initialize expects an application id, InitializeOptions, or a map');
     }
     await _methodChannel.invokeMethod('initialize', args);
   }
@@ -83,8 +113,7 @@ class PushPlatformFlutter {
   /// Associates the current device with a user identifier.
   ///
   /// [userId] - Unique user identifier
-  /// [metadata] - Optional user metadata
-  /// Reserved for compatibility; native SDKs 1.0.0 do not send this value.
+  /// [metadata] - Optional user tags stored by the server login request.
   ///
   /// Returns the device ID on success, or null on failure.
   ///
@@ -123,9 +152,17 @@ class PushPlatformFlutter {
     return await _methodChannel.invokeMethod<String>('getUserId');
   }
 
-  /// Stream of received push messages
-  ///
-  /// Emits a [PushMessage] whenever a push notification is received.
+  Future<String?> getDeviceToken() {
+    return _methodChannel.invokeMethod<String>('getDeviceToken');
+  }
+
+  Future<String> getPermissionStatus() async {
+    final status = await _methodChannel.invokeMethod<String>('getPermissionStatus');
+    if (status == 'granted' || status == 'denied' || status == 'not-determined') return status!;
+    return 'not-determined';
+  }
+
+  /// Delivery only. A click is [onNotificationOpened].
   Stream<PushMessage> get onPushReceived {
     _onPushReceived ??= _pushEventChannel.receiveBroadcastStream().map(
           (event) => PushMessage.fromMap(
@@ -133,6 +170,49 @@ class PushPlatformFlutter {
           ),
         );
     return _onPushReceived!;
+  }
+
+  Stream<PushMessage> get onNotificationOpened {
+    _onNotificationOpened ??= _openedEventChannel.receiveBroadcastStream().map(
+          (event) => PushMessage.fromMap(Map<String, dynamic>.from(event as Map)),
+        );
+    return _onNotificationOpened!;
+  }
+
+  Stream<String> get onPushToken {
+    _onPushToken ??= _tokenEventChannel.receiveBroadcastStream().map((event) => event as String);
+    return _onPushToken!;
+  }
+
+  Stream<NotificationDisplayEvent> get onNotificationWillDisplay {
+    _displayController ??= StreamController<NotificationDisplayEvent>.broadcast(
+      onListen: () {
+        _displaySource = _willDisplayEventChannel.receiveBroadcastStream().listen((event) {
+          final payload = Map<String, dynamic>.from(event as Map);
+          final message = PushMessage.fromMap(Map<String, dynamic>.from(payload['notification'] as Map));
+          var settled = false;
+          var prevented = false;
+          final display = NotificationDisplayEvent(
+            notification: message,
+            preventDefault: () {
+              if (!settled) prevented = true;
+            },
+          );
+          _displayController?.add(display);
+          settled = true;
+          unawaited(_methodChannel.invokeMethod('completeNotificationDisplay', {
+            'id': payload['id'],
+            'prevented': prevented,
+          }));
+        });
+      },
+      onCancel: () async {
+        await _displaySource?.cancel();
+        _displaySource = null;
+      },
+    );
+    _onNotificationWillDisplay ??= _displayController!.stream;
+    return _onNotificationWillDisplay!;
   }
 
   /// Stream of SDK state changes
