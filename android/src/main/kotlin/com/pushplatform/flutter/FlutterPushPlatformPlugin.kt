@@ -1,7 +1,9 @@
 package com.pushplatform.flutter
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -11,6 +13,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
+import com.pushplatform.sdk.NotificationDisplay
 import com.pushplatform.sdk.PushPlatform
 import com.pushplatform.sdk.PushPlatformDelegate
 import com.pushplatform.sdk.Environment
@@ -18,13 +21,16 @@ import com.pushplatform.sdk.models.SdkError
 import com.pushplatform.sdk.notifications.ParsedNotification
 import com.pushplatform.sdk.core.UserManager
 import com.pushplatform.sdk.utils.PermissionChecker
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /// Flutter plugin for Push Platform Android SDK
 ///
 /// This plugin acts as a thin bridge between Flutter (Dart) and the native Android SDK.
 /// All business logic, retry, deduplication, and token management happen in the Android SDK.
 ///
-/// SECURITY: Raw FCM tokens are NEVER passed to Dart.
 class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandler,
     PluginRegistry.RequestPermissionsResultListener {
 
@@ -34,10 +40,19 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
     private lateinit var pushEventChannel: EventChannel
     private lateinit var callEventChannel: EventChannel
     private lateinit var stateEventChannel: EventChannel
+    private lateinit var openedEventChannel: EventChannel
+    private lateinit var willDisplayEventChannel: EventChannel
+    private lateinit var tokenEventChannel: EventChannel
 
     private var pushEventSink: EventChannel.EventSink? = null
     private var callEventSink: EventChannel.EventSink? = null
     private var stateEventSink: EventChannel.EventSink? = null
+    private var openedEventSink: EventChannel.EventSink? = null
+    private var willDisplayEventSink: EventChannel.EventSink? = null
+    private var tokenEventSink: EventChannel.EventSink? = null
+    private val pendingDisplays = ConcurrentHashMap<String, NotificationDisplay>()
+    private val displayLatches = ConcurrentHashMap<String, CountDownLatch>()
+    @Volatile private var willDisplayObserved = false
 
     private var activity: Activity? = null
     private var activityBinding: ActivityPluginBinding? = null
@@ -54,11 +69,17 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         pushEventChannel = EventChannel(binding.binaryMessenger, "com.pushplatform/push_events")
         callEventChannel = EventChannel(binding.binaryMessenger, "com.pushplatform/call_events")
         stateEventChannel = EventChannel(binding.binaryMessenger, "com.pushplatform/state_events")
+        openedEventChannel = EventChannel(binding.binaryMessenger, "com.pushplatform/notification_opened")
+        willDisplayEventChannel = EventChannel(binding.binaryMessenger, "com.pushplatform/notification_will_display")
+        tokenEventChannel = EventChannel(binding.binaryMessenger, "com.pushplatform/token_events")
 
         methodChannel.setMethodCallHandler(this)
         pushEventChannel.setStreamHandler(PushEventStreamHandler(this))
         callEventChannel.setStreamHandler(CallEventStreamHandler(this))
         stateEventChannel.setStreamHandler(StateEventStreamHandler(this))
+        openedEventChannel.setStreamHandler(OpenedEventStreamHandler(this))
+        willDisplayEventChannel.setStreamHandler(WillDisplayEventStreamHandler(this))
+        tokenEventChannel.setStreamHandler(TokenEventStreamHandler(this))
 
         // Set delegate to receive SDK callbacks
         sdk.delegate = DelegateImpl(this)
@@ -71,6 +92,9 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         pushEventChannel.setStreamHandler(null)
         callEventChannel.setStreamHandler(null)
         stateEventChannel.setStreamHandler(null)
+        openedEventChannel.setStreamHandler(null)
+        willDisplayEventChannel.setStreamHandler(null)
+        tokenEventChannel.setStreamHandler(null)
         sdk.delegate = null
     }
 
@@ -109,6 +133,16 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
             "login" -> handleLogin(call, result)
             "logout" -> handleLogout(result)
             "getDeviceId" -> result.success(sdk.getInstallationId())
+            "getDeviceToken" -> result.success(sdk.getDeviceToken())
+            "getPermissionStatus" -> result.success(permissionStatus())
+            "setNotificationWillDisplayObserved" -> {
+                willDisplayObserved = call.arguments as? Boolean ?: false
+                result.success(null)
+            }
+            "completeNotificationDisplay" -> {
+                completeDisplay(call)
+                result.success(null)
+            }
             "getUserId" -> result.success(null) // SDK doesn't expose current user ID
             else -> result.notImplemented()
         }
@@ -126,6 +160,10 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         val applicationId = args["applicationId"] as? String
         if (applicationId.isNullOrBlank()) {
             result.error("INVALID_ARGUMENTS", "applicationId is required", null)
+            return
+        }
+        if (args["apiBaseURL"] != null && args["url"] == null) {
+            result.error("INVALID_ARGUMENTS", "url is required", null)
             return
         }
         val debugMode = args["debugMode"] as? Boolean ?: false
@@ -212,7 +250,9 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
             return
         }
 
-        sdk.login(userId) { loginResult ->
+        @Suppress("UNCHECKED_CAST")
+        val metadata = args["metadata"] as? Map<String, Any?>
+        sdk.login(userId, metadata) { loginResult ->
             mainHandler.post {
                 when (loginResult) {
                     is UserManager.Result.Success -> {
@@ -270,9 +310,24 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
 
     // Event serialization
 
+    private fun permissionStatus(): String {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || sdk.hasNotificationPermission()) return "granted"
+        val act = activity
+        if (act != null && act.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) return "denied"
+        return "not-determined"
+    }
+
+    private fun completeDisplay(call: MethodCall) {
+        val args = call.arguments as? Map<*, *> ?: return
+        val id = args["id"] as? String ?: return
+        val event = pendingDisplays.remove(id) ?: return
+        if (args["prevented"] == true) event.preventDefault()
+        displayLatches.remove(id)?.countDown()
+    }
+
     private fun serializeNotification(notification: ParsedNotification): Map<String, Any?> {
         return mapOf(
-            "messageId" to notification.eventId,
+            "messageId" to (notification.eventId ?: "notification"),
             "title" to notification.title,
             "body" to notification.body,
             "data" to notification.customData,
@@ -312,8 +367,39 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         }
 
         override fun didUpdateFcmToken() {
-            // SECURITY: Token is NEVER passed to Dart
-            plugin.mainHandler.post { plugin.stateEventSink?.success("registered") }
+            plugin.mainHandler.post {
+                plugin.stateEventSink?.success("registered")
+                plugin.sdk.getDeviceToken()?.let { plugin.tokenEventSink?.success(it) }
+            }
+        }
+
+        override fun didUpdateDeviceToken(token: String) {
+            plugin.mainHandler.post { plugin.tokenEventSink?.success(token) }
+        }
+
+        override fun notificationWillDisplay(event: NotificationDisplay) {
+            if (!plugin.willDisplayObserved) return
+            val id = UUID.randomUUID().toString()
+            val latch = CountDownLatch(1)
+            plugin.pendingDisplays[id] = event
+            plugin.displayLatches[id] = latch
+            plugin.mainHandler.post {
+                plugin.willDisplayEventSink?.success(mapOf(
+                    "id" to id,
+                    "notification" to plugin.serializeNotification(event.notification)
+                ))
+            }
+            try {
+                latch.await(8, TimeUnit.SECONDS)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+            }
+        }
+
+        override fun didOpenNotification(notification: ParsedNotification) {
+            plugin.mainHandler.post {
+                plugin.openedEventSink?.success(plugin.serializeNotification(notification))
+            }
         }
 
         override fun didFailToRegisterFcmToken(error: SdkError) {
@@ -368,6 +454,30 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         override fun onCancel(arguments: Any?) {
             plugin.callEventSink = null
         }
+    }
+
+    private class OpenedEventStreamHandler(private val plugin: FlutterPushPlatformPlugin) :
+        EventChannel.StreamHandler {
+        override fun onListen(arguments: Any?, events: EventChannel.EventSink?) { plugin.openedEventSink = events }
+        override fun onCancel(arguments: Any?) { plugin.openedEventSink = null }
+    }
+
+    private class WillDisplayEventStreamHandler(private val plugin: FlutterPushPlatformPlugin) :
+        EventChannel.StreamHandler {
+        override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+            plugin.willDisplayEventSink = events
+            plugin.willDisplayObserved = true
+        }
+        override fun onCancel(arguments: Any?) {
+            plugin.willDisplayEventSink = null
+            plugin.willDisplayObserved = false
+        }
+    }
+
+    private class TokenEventStreamHandler(private val plugin: FlutterPushPlatformPlugin) :
+        EventChannel.StreamHandler {
+        override fun onListen(arguments: Any?, events: EventChannel.EventSink?) { plugin.tokenEventSink = events }
+        override fun onCancel(arguments: Any?) { plugin.tokenEventSink = null }
     }
 
     private class StateEventStreamHandler(private val plugin: FlutterPushPlatformPlugin) :

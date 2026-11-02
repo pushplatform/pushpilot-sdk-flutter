@@ -1,3 +1,11 @@
+# 1.2.3 — 2026-11-02
+
+- `initialize` принимает строку, `InitializeOptions` или map. Адрес только `url`.
+- Отдельные потоки `onNotificationOpened` и `onNotificationWillDisplay`. `onPushReceived` остаётся доставкой. У показа есть `preventDefault()` до возврата обработчика.
+- Android проводит клик, показ и токен в Dart. `getDeviceToken()` и `getPermissionStatus()` доступны на обеих платформах.
+- `login(userId, metadata)` доходит до натива и в тело login на сервере.
+- Зависит от `sdk-android` 1.2.1 и `PushPlatformSDK` 1.2.2.
+
 # 1.2.2 — 2026-11-02
 
 - README на pub.dev описывает плагин 1.2.2 и опубликованные native SDK 1.2.0. В 1.2.1 на pub.dev остался текст про 1.1.1 и вшитые исходники iOS; ту версию заменить нельзя.
