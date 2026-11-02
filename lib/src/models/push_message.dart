@@ -7,6 +7,10 @@ class PushMessage {
   /// Unique message identifier
   final String messageId;
 
+  /// Server notification id (the `id` from `POST /notifications`).
+  /// The native SDK reports the open with it automatically.
+  final String? notificationId;
+
   /// Notification title (null for silent push)
   final String? title;
 
@@ -24,6 +28,7 @@ class PushMessage {
 
   const PushMessage({
     required this.messageId,
+    this.notificationId,
     this.title,
     this.body,
     required this.data,
@@ -35,6 +40,7 @@ class PushMessage {
   factory PushMessage.fromMap(Map<String, dynamic> map) {
     return PushMessage(
       messageId: map['messageId'] as String,
+      notificationId: map['notificationId'] as String?,
       title: map['title'] as String?,
       body: map['body'] as String?,
       data: Map<String, dynamic>.from(map['data'] as Map? ?? {}),
@@ -49,6 +55,7 @@ class PushMessage {
   Map<String, dynamic> toMap() {
     return {
       'messageId': messageId,
+      'notificationId': notificationId,
       'title': title,
       'body': body,
       'data': data,
@@ -62,6 +69,7 @@ class PushMessage {
     if (identical(this, other)) return true;
     return other is PushMessage &&
         other.messageId == messageId &&
+        other.notificationId == notificationId &&
         other.title == title &&
         other.body == body &&
         mapEquals(other.data, data) &&
@@ -73,6 +81,7 @@ class PushMessage {
   int get hashCode {
     return Object.hash(
       messageId,
+      notificationId,
       title,
       body,
       Object.hashAllUnordered(
@@ -85,7 +94,7 @@ class PushMessage {
 
   @override
   String toString() {
-    return 'PushMessage(messageId: $messageId, title: $title, body: $body, '
-        'type: $type, receivedAt: $receivedAt)';
+    return 'PushMessage(messageId: $messageId, notificationId: $notificationId, '
+        'title: $title, body: $body, type: $type, receivedAt: $receivedAt)';
   }
 }

@@ -334,6 +334,7 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
     private fun serializeNotification(notification: ParsedNotification): Map<String, Any?> {
         return mapOf(
             "messageId" to (notification.eventId ?: "notification"),
+            "notificationId" to notification.notificationId,
             "title" to notification.title,
             "body" to notification.body,
             "data" to notification.customData,
