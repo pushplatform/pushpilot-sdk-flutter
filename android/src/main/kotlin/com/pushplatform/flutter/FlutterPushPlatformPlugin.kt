@@ -24,7 +24,6 @@ import com.pushplatform.sdk.utils.PermissionChecker
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 /// Flutter plugin for Push Platform Android SDK
 ///
@@ -160,10 +159,6 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         val applicationId = args["applicationId"] as? String
         if (applicationId.isNullOrBlank()) {
             result.error("INVALID_ARGUMENTS", "applicationId is required", null)
-            return
-        }
-        if (args["apiBaseURL"] != null && args["url"] == null) {
-            result.error("INVALID_ARGUMENTS", "url is required", null)
             return
         }
         val debugMode = args["debugMode"] as? Boolean ?: false
@@ -390,7 +385,7 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
                 ))
             }
             try {
-                latch.await(8, TimeUnit.SECONDS)
+                latch.await()
             } catch (_: InterruptedException) {
                 Thread.currentThread().interrupt()
             }

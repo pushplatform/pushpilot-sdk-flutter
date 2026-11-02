@@ -440,7 +440,7 @@ await sdk.initialize(
 
 **Fix**:
 1. Check internet connectivity
-2. Verify `apiBaseURL` is correct
+2. Verify `url` is correct
 3. Check firewall/proxy settings
 4. Retry with exponential backoff:
 ```dart

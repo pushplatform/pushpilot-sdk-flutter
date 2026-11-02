@@ -1,13 +1,13 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.2.3** зависит от опубликованных Android SDK **1.2.1** и CocoaPod `PushPlatformSDK` **1.2.2**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.2.4** зависит от опубликованных Android SDK **1.2.2** и CocoaPod `PushPlatformSDK` **1.2.4**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
 Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/main/docs/UNIFIED_APPLICATIONS.md).
 
 ```sh
-flutter pub add push_platform_flutter:^1.2.3
+flutter pub add push_platform_flutter:^1.2.4
 ```
 
 Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
@@ -16,15 +16,15 @@ flutter pub add push_platform_flutter:^1.2.3
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: ^1.2.3
+  push_platform_flutter: ^1.2.4
 ```
 
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
-- Android: `com.pushplatform:sdk-android:1.2.1` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
-- iOS: опубликованный pod `PushPlatformSDK` **1.2.2**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Отдельная строка `pod` в приложении, Git dependency и соседний checkout не нужны.
+- Android: `com.pushplatform:sdk-android:1.2.2` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
+- iOS: опубликованный pod `PushPlatformSDK` **1.2.4**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Отдельная строка `pod` в приложении, Git dependency и соседний checkout не нужны.
 
-CocoaPods по-прежнему используется для интеграции Flutter и подтягивает `PushPlatformSDK` из Trunk. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.3**. Предыдущие версии на сайте не заменяются.
+CocoaPods по-прежнему используется для интеграции Flutter и подтягивает `PushPlatformSDK` из Trunk. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.4**. Предыдущие версии на сайте не заменяются.
 
 ## Настройка Android
 
@@ -139,9 +139,9 @@ class _PushDemoState extends State<PushDemo> {
 [Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/release/flutter-fcm-1.0.2/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
 
 
-### Текущая поставка · 1.2.3
+### Текущая поставка · 1.2.4
 
-`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment` и `debugMode`. Секретный ключ не нужен. `apiBaseURL` без `url` — ошибка. Нативные зависимости — опубликованные `sdk-android:1.2.1` и `PushPlatformSDK` 1.2.2.
+`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment` и `debugMode`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.2` и `PushPlatformSDK` 1.2.4.
 
 ### Unified applications · 1.1.0
 

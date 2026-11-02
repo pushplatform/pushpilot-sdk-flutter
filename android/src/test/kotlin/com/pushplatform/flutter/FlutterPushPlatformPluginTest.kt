@@ -31,8 +31,8 @@ class FlutterPushPlatformPluginTest {
     @Test
     fun `initialize with valid parameters succeeds`() {
         val arguments = mapOf(
-            "apiKey" to "test-api-key",
-            "apiBaseURL" to "https://api.test.pushplatform.example",
+            "applicationId" to "11111111-1111-1111-1111-111111111111",
+            "url" to "https://api.test.pushplatform.example",
             "environment" to "development",
             "debugMode" to true
         )
