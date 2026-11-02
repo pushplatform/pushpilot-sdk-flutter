@@ -1,3 +1,7 @@
+# 1.2.1 — 2026-11-02
+
+- Example initialization uses a const `InitializeOptions`, so `flutter analyze` passes on the published package.
+
 # 1.2.0 — 2026-11-01
 
 - `initialize` takes an application id or `{applicationId, url, environment}`. No API key and no `apiBaseURL`.
