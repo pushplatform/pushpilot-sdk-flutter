@@ -1,3 +1,9 @@
+# 1.2.4 — 2026-11-02
+
+- Адрес только `url`. Старое имя адреса удалено.
+- Показ ждёт обработчик без восьмисекундного таймера.
+- Зависит от `sdk-android` 1.2.2 и `PushPlatformSDK` 1.2.4.
+
 # 1.2.3 — 2026-11-02
 
 - `initialize` принимает строку, `InitializeOptions` или map. Адрес только `url`.
@@ -16,7 +22,7 @@
 
 # 1.2.0 — 2026-11-01
 
-- `initialize` takes an application id or `{applicationId, url, environment}`. No API key and no `apiBaseURL`.
+- `initialize` takes an application id or `{applicationId, url, environment}`. No API key is sent.
 - The plugin depends on the published iOS and Android SDKs.
 
 # 1.1.1 — 2026-11-01
@@ -52,7 +58,7 @@ Documentation/packaging correction: README now identifies the bundled Android/iO
 - Первый самостоятельный релиз для pub.dev; имя пакета `push_platform_flutter` сохранено.
 - Подключены опубликованные Android SDK `com.pushplatform:sdk-android:1.0.0` из публичного Maven и CocoaPod `PushPlatformSDK` 1.0.0.
 - Удалена зависимость примера от соседнего Android checkout; установка не требует Maven Local и приватного Git.
-- `initialize` требует `applicationId` (UUID PushPilot) и `apiBaseURL`; ожидает завершения регистрации на обеих платформах.
+- `initialize` требует `applicationId` (UUID PushPilot) и адрес `url`; ожидает завершения регистрации на обеих платформах.
 - Исправлены APNs lifecycle callbacks, Android permission result и передача асинхронных результатов на главный поток.
 - Добавлены MIT LICENSE, корректные ссылки, инструкция на русском и отчёт о релизе.
 

@@ -100,10 +100,6 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "INVALID_ARGUMENTS", message: "applicationId is required", details: nil))
             return
         }
-        if args["apiBaseURL"] != nil && args["url"] == nil {
-            result(FlutterError(code: "INVALID_ARGUMENTS", message: "url is required", details: nil))
-            return
-        }
         let debugMode = args["debugMode"] as? Bool ?? false
         var options = PushPlatform.InitializeOptions(applicationId: applicationId, url: args["url"] as? String, debugMode: debugMode)
         if let name = (args["environment"] as? String)?.lowercased() {

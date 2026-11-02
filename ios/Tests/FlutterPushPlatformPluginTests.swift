@@ -27,8 +27,8 @@ class FlutterPushPlatformPluginTests: XCTestCase {
         let call = FlutterMethodCall(
             methodName: "initialize",
             arguments: [
-                "apiKey": "test-api-key",
-                "apiBaseURL": "https://api.test.pushplatform.example",
+                "applicationId": "11111111-1111-1111-1111-111111111111",
+                "url": "https://api.test.pushplatform.example",
                 "environment": "development",
                 "debugMode": true
             ]

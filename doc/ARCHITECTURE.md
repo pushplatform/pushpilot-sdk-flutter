@@ -314,7 +314,7 @@ Flutter App
 
 | Method | Arguments | Returns | Errors |
 |--------|-----------|---------|--------|
-| `initialize` | `{apiKey, apiBaseURL?, environment, debugMode}` | `null` | `NOT_INITIALIZED`, `INVALID_ARGUMENTS` |
+| `initialize` | `{applicationId, url?, environment, debugMode}` | `null` | `NOT_INITIALIZED`, `INVALID_ARGUMENTS` |
 | `requestPermissions` | `null` | `bool` | `PERMISSION_DENIED` |
 | `login` | `{userId, metadata?}` | `String?` (deviceId) | `NOT_INITIALIZED`, `INVALID_ARGUMENTS`, `NETWORK_ERROR` |
 | `logout` | `null` | `null` | `NOT_INITIALIZED` |

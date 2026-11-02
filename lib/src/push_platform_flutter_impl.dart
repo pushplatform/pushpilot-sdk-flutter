@@ -81,9 +81,6 @@ class PushPlatformFlutter {
       if (applicationId is! String || applicationId.isEmpty) {
         throw ArgumentError('applicationId is required');
       }
-      if (config['apiBaseURL'] != null && config['url'] == null) {
-        throw ArgumentError('url is required');
-      }
       args = {
         'applicationId': applicationId,
         if (config['url'] != null) 'url': config['url'],
