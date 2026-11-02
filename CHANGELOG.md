@@ -1,3 +1,7 @@
+# 1.2.2 — 2026-11-02
+
+- README на pub.dev описывает плагин 1.2.2 и опубликованные native SDK 1.2.0. В 1.2.1 на pub.dev остался текст про 1.1.1 и вшитые исходники iOS; ту версию заменить нельзя.
+
 # 1.2.1 — 2026-11-02
 
 - Example initialization uses a const `InitializeOptions`, so `flutter analyze` passes on the published package.
