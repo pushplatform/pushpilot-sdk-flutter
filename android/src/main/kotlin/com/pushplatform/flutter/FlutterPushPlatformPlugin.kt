@@ -23,7 +23,6 @@ import com.pushplatform.sdk.core.UserManager
 import com.pushplatform.sdk.utils.PermissionChecker
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CountDownLatch
 
 /// Flutter plugin for Push Platform Android SDK
 ///
@@ -50,7 +49,6 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
     private var willDisplayEventSink: EventChannel.EventSink? = null
     private var tokenEventSink: EventChannel.EventSink? = null
     private val pendingDisplays = ConcurrentHashMap<String, NotificationDisplay>()
-    private val displayLatches = ConcurrentHashMap<String, CountDownLatch>()
     @Volatile private var willDisplayObserved = false
 
     private var activity: Activity? = null
@@ -162,6 +160,18 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
             return
         }
         val debugMode = args["debugMode"] as? Boolean ?: false
+        val foregroundBannerFallback = when (val raw = args["foregroundBannerFallback"]) {
+            null -> 0.0
+            is Number -> raw.toDouble()
+            else -> {
+                result.error("INVALID_ARGUMENTS", "foregroundBannerFallback must be a non-negative number of seconds", null)
+                return
+            }
+        }
+        if (!foregroundBannerFallback.isFinite() || foregroundBannerFallback < 0) {
+            result.error("INVALID_ARGUMENTS", "foregroundBannerFallback must be a non-negative number of seconds", null)
+            return
+        }
         val environment = when ((args["environment"] as? String)?.lowercase()) {
             null -> null
             "production" -> Environment.PRODUCTION
@@ -179,7 +189,8 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
                     applicationId = applicationId,
                     url = args["url"] as? String,
                     environment = environment,
-                    debugMode = debugMode
+                    debugMode = debugMode,
+                    foregroundBannerFallback = foregroundBannerFallback
                 )
             ) { configurationResult ->
                 mainHandler.post {
@@ -317,7 +328,7 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         val id = args["id"] as? String ?: return
         val event = pendingDisplays.remove(id) ?: return
         if (args["prevented"] == true) event.preventDefault()
-        displayLatches.remove(id)?.countDown()
+        event.finish()
     }
 
     private fun serializeNotification(notification: ParsedNotification): Map<String, Any?> {
@@ -375,19 +386,13 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
         override fun notificationWillDisplay(event: NotificationDisplay) {
             if (!plugin.willDisplayObserved) return
             val id = UUID.randomUUID().toString()
-            val latch = CountDownLatch(1)
             plugin.pendingDisplays[id] = event
-            plugin.displayLatches[id] = latch
+            event.deferDecision()
             plugin.mainHandler.post {
                 plugin.willDisplayEventSink?.success(mapOf(
                     "id" to id,
                     "notification" to plugin.serializeNotification(event.notification)
                 ))
-            }
-            try {
-                latch.await()
-            } catch (_: InterruptedException) {
-                Thread.currentThread().interrupt()
             }
         }
 

@@ -16,12 +16,14 @@ class InitializeOptions {
   final String? url;
   final String? environment;
   final bool debugMode;
+  final double? foregroundBannerFallback;
 
   const InitializeOptions({
     required this.applicationId,
     this.url,
     this.environment,
     this.debugMode = false,
+    this.foregroundBannerFallback,
   });
 }
 
@@ -70,27 +72,49 @@ class PushPlatformFlutter {
     if (config is String) {
       args = {'applicationId': config};
     } else if (config is InitializeOptions) {
+      _rejectInvalidFallback(config.foregroundBannerFallback);
       args = {
         'applicationId': config.applicationId,
         if (config.url != null) 'url': config.url,
         if (config.environment != null) 'environment': config.environment,
         'debugMode': config.debugMode,
+        if (config.foregroundBannerFallback != null)
+          'foregroundBannerFallback': config.foregroundBannerFallback,
       };
     } else if (config is Map) {
       final applicationId = config['applicationId'];
       if (applicationId is! String || applicationId.isEmpty) {
         throw ArgumentError('applicationId is required');
       }
+      final fallback = _readFallback(config['foregroundBannerFallback']);
       args = {
         'applicationId': applicationId,
         if (config['url'] != null) 'url': config['url'],
         if (config['environment'] != null) 'environment': config['environment'],
         'debugMode': config['debugMode'] == true,
+        if (fallback != null) 'foregroundBannerFallback': fallback,
       };
     } else {
       throw ArgumentError('initialize expects an application id, InitializeOptions, or a map');
     }
     await _methodChannel.invokeMethod('initialize', args);
+  }
+
+  void _rejectInvalidFallback(double? seconds) {
+    if (seconds == null) return;
+    if (!seconds.isFinite || seconds < 0) {
+      throw ArgumentError('foregroundBannerFallback must be a non-negative number of seconds');
+    }
+  }
+
+  double? _readFallback(Object? value) {
+    if (value == null) return null;
+    if (value is! num) {
+      throw ArgumentError('foregroundBannerFallback must be a non-negative number of seconds');
+    }
+    final seconds = value.toDouble();
+    _rejectInvalidFallback(seconds);
+    return seconds;
   }
 
   /// Request push notification permissions
