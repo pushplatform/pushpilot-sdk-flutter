@@ -321,6 +321,9 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             dict["body"] = body
         }
         dict["messageId"] = notification.eventID ?? notification.callID ?? "notification"
+        if let notificationID = notification.notificationID {
+            dict["notificationId"] = notificationID
+        }
 
         // Sanitize customData for JSON serialization
         dict["data"] = sanitizeForJSON(notification.customData)

@@ -25,6 +25,16 @@ void main() {
       expect(message.receivedAt, testTimestamp);
     });
 
+    test('notificationId is optional and round-trips', () {
+      expect(PushMessage.fromMap(testMap).notificationId, isNull);
+      final map = Map<String, dynamic>.from(testMap)
+        ..['notificationId'] = 'notification-1';
+      final message = PushMessage.fromMap(map);
+      expect(message.notificationId, 'notification-1');
+      expect(PushMessage.fromMap(message.toMap()), message);
+      expect(message, isNot(PushMessage.fromMap(testMap)));
+    });
+
     test('fromMap handles null title and body', () {
       final map = Map<String, dynamic>.from(testMap);
       map.remove('title');
