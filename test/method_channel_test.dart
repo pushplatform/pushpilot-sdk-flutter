@@ -39,6 +39,28 @@ void main() {
           .setMockMethodCallHandler(channel, null);
     });
 
+    test('initialize() passes a foreground banner fallback and omits it for an application id', () async {
+      await sdk.initialize(InitializeOptions(
+        applicationId: '11111111-1111-1111-1111-111111111111',
+        foregroundBannerFallback: 10,
+      ));
+      expect(log.single.arguments['foregroundBannerFallback'], 10);
+
+      log.clear();
+      await sdk.initialize('11111111-1111-1111-1111-111111111111');
+      expect(log.single.arguments.containsKey('foregroundBannerFallback'), false);
+    });
+
+    test('initialize() rejects a negative foreground banner fallback', () async {
+      await expectLater(
+        () => sdk.initialize(InitializeOptions(
+          applicationId: '11111111-1111-1111-1111-111111111111',
+          foregroundBannerFallback: -1,
+        )),
+        throwsArgumentError,
+      );
+    });
+
     test('initialize() calls platform with correct arguments', () async {
       await sdk.initialize(InitializeOptions(
         applicationId: '11111111-1111-1111-1111-111111111111',

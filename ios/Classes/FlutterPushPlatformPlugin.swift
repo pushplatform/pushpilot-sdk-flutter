@@ -101,7 +101,12 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             return
         }
         let debugMode = args["debugMode"] as? Bool ?? false
-        var options = PushPlatform.InitializeOptions(applicationId: applicationId, url: args["url"] as? String, debugMode: debugMode)
+        let fallback = (args["foregroundBannerFallback"] as? NSNumber)?.doubleValue ?? 0
+        guard fallback.isFinite, fallback >= 0 else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", message: "foregroundBannerFallback must be a non-negative number of seconds", details: nil))
+            return
+        }
+        var options = PushPlatform.InitializeOptions(applicationId: applicationId, url: args["url"] as? String, debugMode: debugMode, foregroundBannerFallback: fallback)
         if let name = (args["environment"] as? String)?.lowercased() {
             switch name {
             case "production": options.environment = .production
