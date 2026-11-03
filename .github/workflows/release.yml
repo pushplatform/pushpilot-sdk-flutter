@@ -12,6 +12,7 @@ permissions:
 jobs:
   pub:
     if: inputs.publish && github.ref == 'refs/heads/main'
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +26,17 @@ jobs:
         env:
           PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
         run: |
+          set -eu
+          version=$(awk '/^version:/{print $2; exit}' pubspec.yaml)
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "https://pub.dev/api/packages/push_platform_flutter/versions/${version}")
+          if [ "$code" = "200" ]; then
+            echo "pub.dev already has ${version}"
+            exit 0
+          fi
+          if [ -z "${PUB_CREDENTIALS}" ]; then
+            echo "PUB_CREDENTIALS is not set, so ${version} cannot be published" >&2
+            exit 1
+          fi
           mkdir -p "$HOME/.config/dart"
           printf '%s' "$PUB_CREDENTIALS" > "$HOME/.config/dart/pub-credentials.json"
           flutter pub publish --force
