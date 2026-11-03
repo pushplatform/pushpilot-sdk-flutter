@@ -1,6 +1,6 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.2.7** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.7**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.2.7** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.6**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
@@ -22,7 +22,7 @@ dependencies:
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
 - Android: `com.pushplatform:sdk-android:1.2.5` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
-- iOS: опубликованный pod `PushPlatformSDK` **1.2.7**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Отдельная строка `pod` в приложении, Git dependency и соседний checkout не нужны.
+- iOS: опубликованный pod `PushPlatformSDK` **1.2.6**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Отдельная строка `pod` в приложении, Git dependency и соседний checkout не нужны.
 
 CocoaPods по-прежнему используется для интеграции Flutter и подтягивает `PushPlatformSDK` из Trunk. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.7**. Предыдущие версии на сайте не заменяются.
 
@@ -141,7 +141,7 @@ class _PushDemoState extends State<PushDemo> {
 
 ### Текущая поставка · 1.2.7
 
-`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.7.
+`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.6.
 
 Открытие уведомления нативный SDK сообщает сам: при клике, в том числе при холодном старте, он отправляет `PUT /notifications/{id}`; до `initialize` открытие ждёт в очереди. `PushMessage.notificationId` в потоках клика и показа содержит id из ответа `POST /notifications`; поле `notification_id` в `data` не попадает.
 

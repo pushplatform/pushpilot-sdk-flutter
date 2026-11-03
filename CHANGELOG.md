@@ -2,7 +2,7 @@
 
 - Нативный iOS SDK сбрасывает бейдж при входе и подтверждает получение через Notification Service Extension. Нативный Android SDK показывает data-only баннер, ставит бейдж и сбрасывает его при входе.
 - Новых вызовов в Dart нет.
-- Зависит от `sdk-android` 1.2.5 и `PushPlatformSDK` 1.2.7. Для `received` при закрытом iOS-приложении нужен target extension и App Group `group.<bundle id>.pushplatform`.
+- Зависит от `sdk-android` 1.2.5 и опубликованного `PushPlatformSDK` 1.2.6. CocoaPods trunk до 6 ноября не принимает 1.2.7.
 
 # 1.2.6 — 2026-11-02
 
