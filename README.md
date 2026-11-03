@@ -1,13 +1,13 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.2.6** зависит от опубликованных Android SDK **1.2.4** и CocoaPod `PushPlatformSDK` **1.2.6**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.2.7** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.6**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
 Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/main/docs/UNIFIED_APPLICATIONS.md).
 
 ```sh
-flutter pub add push_platform_flutter:^1.2.6
+flutter pub add push_platform_flutter:^1.2.7
 ```
 
 Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
@@ -16,15 +16,15 @@ flutter pub add push_platform_flutter:^1.2.6
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: ^1.2.6
+  push_platform_flutter: ^1.2.7
 ```
 
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
-- Android: `com.pushplatform:sdk-android:1.2.4` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
+- Android: `com.pushplatform:sdk-android:1.2.5` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
 - iOS: опубликованный pod `PushPlatformSDK` **1.2.6**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Отдельная строка `pod` в приложении, Git dependency и соседний checkout не нужны.
 
-CocoaPods по-прежнему используется для интеграции Flutter и подтягивает `PushPlatformSDK` из Trunk. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.6**. Предыдущие версии на сайте не заменяются.
+CocoaPods по-прежнему используется для интеграции Flutter и подтягивает `PushPlatformSDK` из Trunk. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.7**. Предыдущие версии на сайте не заменяются.
 
 ## Настройка Android
 
@@ -139,9 +139,9 @@ class _PushDemoState extends State<PushDemo> {
 [Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/release/flutter-fcm-1.0.2/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
 
 
-### Текущая поставка · 1.2.6
+### Текущая поставка · 1.2.7
 
-`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.4` и `PushPlatformSDK` 1.2.6.
+`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.6.
 
 Открытие уведомления нативный SDK сообщает сам: при клике, в том числе при холодном старте, он отправляет `PUT /notifications/{id}`; до `initialize` открытие ждёт в очереди. `PushMessage.notificationId` в потоках клика и показа содержит id из ответа `POST /notifications`; поле `notification_id` в `data` не попадает.
 
