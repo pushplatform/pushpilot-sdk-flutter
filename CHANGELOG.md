@@ -1,3 +1,7 @@
+# 1.2.8 — 2026-11-03
+
+- В README добавлены шаги Notification Service Extension для iOS и код `NotificationService.swift` для копирования. Новых вызовов в Dart нет. Зависимости те же: `sdk-android` 1.2.5 и `PushPlatformSDK` 1.2.6.
+
 # 1.2.7 — 2026-11-03
 
 - Нативный iOS SDK сбрасывает бейдж при входе и подтверждает получение через Notification Service Extension. Нативный Android SDK показывает data-only баннер, ставит бейдж и сбрасывает его при входе.
