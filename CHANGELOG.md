@@ -1,6 +1,7 @@
 # 1.2.10 — 2026-11-04
 
-- Документация и NSE: `PushPlatformSDK` 1.2.8 резолвится с публичного git-тега `v1.2.8` (CocoaPods Trunk read-only). Podspec по-прежнему `s.dependency 'PushPlatformSDK', '1.2.8'`. Android — `sdk-android` 1.2.5.
+- NSE: `pod 'PushPlatformSDK/Extension'` + `import PushPlatformExtension` (iOS SDK 1.2.9).
+- Документация и NSE: `PushPlatformSDK` 1.2.9 резолвится с публичного git-тега `v1.2.9` (CocoaPods Trunk read-only). Podspec по-прежнему `s.dependency 'PushPlatformSDK', '1.2.9'`. Android — `sdk-android` 1.2.5.
 
 # 1.2.9 — 2026-11-04
 
