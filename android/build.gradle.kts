@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pushplatform.flutter"
-version = "1.2.9"
+version = "1.2.10"
 
 repositories {
     google()
