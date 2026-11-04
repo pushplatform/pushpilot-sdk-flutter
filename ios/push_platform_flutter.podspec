@@ -11,7 +11,7 @@ Provides type-safe Dart API for push notifications, VoIP calls, and user managem
   s.author           = 'PushPilot contributors'
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
-  s.dependency 'PushPlatformSDK', '1.2.8'
+  s.dependency 'PushPlatformSDK', '1.2.9'
   s.frameworks       = 'Foundation', 'UIKit', 'UserNotifications', 'PushKit', 'CallKit', 'AVFoundation', 'Network', 'Security'
 
   s.ios.deployment_target = '13.0'

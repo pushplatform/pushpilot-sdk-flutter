@@ -1,6 +1,6 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.2.10** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.8**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.2.10** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.9**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
@@ -22,10 +22,10 @@ dependencies:
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
 - Android: `com.pushplatform:sdk-android:1.2.5` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
-- iOS: `PushPlatformSDK` **1.2.8**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Пока CocoaPods Trunk read-only и не отдаёт 1.2.8, в `ios/Podfile` сразу после `platform :ios` добавьте pin с публичного git-тега:
+- iOS: `PushPlatformSDK` **1.2.9**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Пока CocoaPods Trunk read-only и не отдаёт 1.2.9, в `ios/Podfile` сразу после `platform :ios` добавьте pin с публичного git-тега:
 
 ```ruby
-pod 'PushPlatformSDK', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v1.2.8'
+pod 'PushPlatformSDK', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v1.2.9'
 ```
 
 Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.10**.
@@ -61,22 +61,22 @@ repositories {
 
 Плагин передаёт APNs callbacks нативному SDK. Токены не нужно получать или отправлять через Dart. ### Подтверждение доставки при закрытом приложении
 
-iOS показывает баннер, не запуская приложение. `received` отправляет `PushPlatformExtension` из `PushPlatformSDK` 1.2.8 (git-тег, пока Trunk read-only). Плагин target не создаёт. Без него баннер и нажатие остаются.
+iOS показывает баннер, не запуская приложение. `received` отправляет `PushPlatformExtension` из `PushPlatformSDK` 1.2.9 (git-тег, пока Trunk read-only). Плагин target не создаёт. Без него баннер и нажатие остаются.
 
 1. Откройте `ios/Runner.xcworkspace`. **File → New → Target → Notification Service Extension**. **Don't Activate**. Deployment Target как у Runner, не ниже iOS 13.
 2. Bundle ID extension — bundle ID приложения плюс `.PushPlatformNotificationService`. Для `com.example.app` это `com.example.app.PushPlatformNotificationService`.
 3. **App Groups** на Runner и на extension: `group.com.example.app.pushplatform`.
-4. В Podfile уже должен быть git-pin `v1.2.8` (см. установку). Добавьте target extension и замените `NotificationService.swift` кодом ниже. Образец: [NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v1.2.8/Sources/PushPlatformNotificationService/NotificationService.swift).
+4. В Podfile уже должен быть git-pin `v1.2.9` (см. установку). Добавьте target extension и замените `NotificationService.swift` кодом ниже. Образец: [NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v1.2.9/Sources/PushPlatformNotificationService/NotificationService.swift).
 
 ```ruby
 target 'PushPlatformNotificationServiceExtension' do
-  pod 'PushPlatformSDK', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v1.2.8'
+  pod 'PushPlatformSDK/Extension', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v1.2.9'
 end
 ```
 
 ```swift
 import UserNotifications
-import PushPlatformSDK
+import PushPlatformExtension
 
 class NotificationService: UNNotificationServiceExtension {
     var contentHandler: ((UNNotificationContent) -> Void)?
@@ -189,7 +189,7 @@ class _PushDemoState extends State<PushDemo> {
 
 ### Текущая поставка · 1.2.10
 
-`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.8.
+`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.9.
 
 Открытие уведомления нативный SDK сообщает сам: при клике, в том числе при холодном старте, он отправляет `PUT /notifications/{id}`; до `initialize` открытие ждёт в очереди. `PushMessage.notificationId` в потоках клика и показа содержит id из ответа `POST /notifications`; поле `notification_id` в `data` не попадает.
 
