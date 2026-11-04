@@ -1,13 +1,13 @@
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.2.8** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.6**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **1.2.9** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.8**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
 Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/main/docs/UNIFIED_APPLICATIONS.md).
 
 ```sh
-flutter pub add push_platform_flutter:^1.2.8
+flutter pub add push_platform_flutter:^1.2.9
 ```
 
 Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
@@ -16,15 +16,15 @@ flutter pub add push_platform_flutter:^1.2.8
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: ^1.2.8
+  push_platform_flutter: ^1.2.9
 ```
 
 Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
 
 - Android: `com.pushplatform:sdk-android:1.2.5` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
-- iOS: опубликованный pod `PushPlatformSDK` **1.2.6**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Отдельная строка `pod` в приложении, Git dependency и соседний checkout не нужны.
+- iOS: опубликованный pod `PushPlatformSDK` **1.2.8**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Отдельная строка `pod` в приложении, Git dependency и соседний checkout не нужны.
 
-CocoaPods по-прежнему используется для интеграции Flutter и подтягивает `PushPlatformSDK` из Trunk. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.8**. Предыдущие версии на сайте не заменяются.
+CocoaPods по-прежнему используется для интеграции Flutter и подтягивает `PushPlatformSDK` из Trunk. Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.9**. Предыдущие версии на сайте не заменяются.
 
 ## Настройка Android
 
@@ -59,48 +59,44 @@ repositories {
 
 ### Подтверждение доставки при закрытом приложении
 
-iOS показывает баннер, не запуская приложение. Чтобы вырос `received`, в Runner добавляется Notification Service Extension. Плагин этот target не создаёт. Без него баннер и нажатие остаются.
+iOS показывает баннер, не запуская приложение. `received` отправляет pod `PushPlatformSDK` 1.2.8. Плагин target не создаёт. Без него баннер и нажатие остаются.
 
 1. Откройте `ios/Runner.xcworkspace`. **File → New → Target → Notification Service Extension**. **Don't Activate**. Deployment Target как у Runner, не ниже iOS 13.
 2. Bundle ID extension — bundle ID приложения плюс `.PushPlatformNotificationService`. Для `com.example.app` это `com.example.app.PushPlatformNotificationService`.
 3. **App Groups** на Runner и на extension: `group.com.example.app.pushplatform`.
-4. Замените `NotificationService.swift` файлом [Sources/PushPlatformNotificationService/NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v1.2.7/Sources/PushPlatformNotificationService/NotificationService.swift). В pod `PushPlatformSDK` 1.2.6 этого файла нет.
+4. В Podfile добавьте target и замените `NotificationService.swift` кодом ниже. Образец: [NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v1.2.8/Sources/PushPlatformNotificationService/NotificationService.swift).
+
+```ruby
+target 'PushPlatformNotificationServiceExtension' do
+  pod 'PushPlatformSDK', '1.2.8'
+end
+```
 
 ```swift
 import UserNotifications
+import PushPlatformSDK
 
 class NotificationService: UNNotificationServiceExtension {
+    var contentHandler: ((UNNotificationContent) -> Void)?
+    var receivedRequest: UNNotificationRequest!
+    var bestAttemptContent: UNMutableNotificationContent?
+
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        guard let content = request.content.mutableCopy() as? UNMutableNotificationContent else {
+        self.receivedRequest = request
+        self.contentHandler = contentHandler
+        bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent
+        if let bestAttemptContent {
+            PushPlatformExtension.didReceive(receivedRequest, with: bestAttemptContent, withContentHandler: contentHandler)
+        } else {
             contentHandler(request.content)
-            return
         }
-        let userInfo = request.content.userInfo
-        let notificationID = userInfo["notification_id"] as? String
-        let bundleID = (Bundle.main.bundleIdentifier ?? "").replacingOccurrences(of: ".PushPlatformNotificationService", with: "")
-        let defaults = UserDefaults(suiteName: "group.\(bundleID).pushplatform")
-        let serverURL = defaults?.string(forKey: "server_url")
-        let applicationID = defaults?.string(forKey: "application_id")
-        let subscriptionID = defaults?.string(forKey: "subscription_id")
-        guard let notificationID, !notificationID.isEmpty,
-              let serverURL, let applicationID, let subscriptionID, !subscriptionID.isEmpty,
-              let encoded = notificationID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
-              let url = URL(string: "\(serverURL)/notifications/\(encoded)") else {
-            contentHandler(content)
-            return
+    }
+
+    override func serviceExtensionTimeWillExpire() {
+        if let contentHandler, let bestAttemptContent,
+           PushPlatformExtension.serviceExtensionTimeWillExpireRequest(receivedRequest, with: bestAttemptContent) {
+            contentHandler(bestAttemptContent)
         }
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: [
-            "app_id": applicationID,
-            "subscription_id": subscriptionID,
-            "received": true,
-        ])
-        let task = URLSession.shared.dataTask(with: request) { _, _, _ in
-            contentHandler(content)
-        }
-        task.resume()
     }
 }
 ```
@@ -189,9 +185,9 @@ class _PushDemoState extends State<PushDemo> {
 [Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/release/flutter-fcm-1.0.2/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
 
 
-### Текущая поставка · 1.2.8
+### Текущая поставка · 1.2.9
 
-`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.6.
+`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.8.
 
 Открытие уведомления нативный SDK сообщает сам: при клике, в том числе при холодном старте, он отправляет `PUT /notifications/{id}`; до `initialize` открытие ждёт в очереди. `PushMessage.notificationId` в потоках клика и показа содержит id из ответа `POST /notifications`; поле `notification_id` в `data` не попадает.
 

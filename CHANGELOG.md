@@ -1,3 +1,7 @@
+# 1.2.9 — 2026-11-04
+
+- iOS-зависимость — `PushPlatformSDK` 1.2.8. Подтверждение при закрытом приложении вызывает `PushPlatformExtension` из пода. В Podfile нужен target extension с тем же подом. Новых вызовов в Dart нет. Android остаётся `sdk-android` 1.2.5.
+
 # 1.2.8 — 2026-11-03
 
 - В README добавлены шаги Notification Service Extension для iOS и код `NotificationService.swift` для копирования. Новых вызовов в Dart нет. Зависимости те же: `sdk-android` 1.2.5 и `PushPlatformSDK` 1.2.6.
