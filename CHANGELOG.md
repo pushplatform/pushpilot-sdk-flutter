@@ -1,3 +1,7 @@
+# 1.2.12 — 2026-11-05
+
+- Один режим storage: custom `url` не регистрирует development. Зависит от iOS **1.2.11** (sandbox из профиля). Чинит universal badge Increase при локальном API.
+
 # 1.2.11 — 2026-11-04
 
 - iOS: `PushPlatformSDK` **1.2.10** + отдельный pod `PushPlatformExtension`. NSE: `pod 'PushPlatformExtension'` (не subspec). В Podfile pin обеих строк с git-тега `v1.2.10` (Trunk read-only). Android — `sdk-android` 1.2.5.

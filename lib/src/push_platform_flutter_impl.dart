@@ -65,7 +65,8 @@ class PushPlatformFlutter {
 
   /// Initialize with an application id, or with `{applicationId, url, environment}`.
   /// A string uses https://api.pushpilot.ru and omits environment.
-  /// A url without environment registers the installation as development.
+  /// Custom url does not imply development; storage is production unless
+  /// `environment` is set explicitly (legacy). APNs sandbox comes from the profile.
   /// A second call returns success.
   Future<void> initialize(Object config) async {
     final Map<String, dynamic> args;
