@@ -67,7 +67,7 @@ iOS показывает баннер, не запуская приложени�
 1. Откройте `ios/Runner.xcworkspace`. **File → New → Target → Notification Service Extension**. **Don't Activate**. Deployment Target как у Runner, не ниже iOS 13.
 2. Bundle ID extension — bundle ID приложения плюс `.PushPlatformNotificationService`. Для `com.example.app` это `com.example.app.PushPlatformNotificationService`.
 3. **App Groups** на Runner и на extension: `group.com.example.app.pushplatform`.
-4. В Podfile уже должен быть git-pin `v1.2.10` (см. установку). Добавьте target extension и замените `NotificationService.swift` кодом ниже. Образец: [NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v1.2.10/Sources/PushPlatformNotificationService/NotificationService.swift).
+4. В Podfile уже должен быть git-pin `v1.2.10` (см. установку). Добавьте target extension и замените `NotificationService.swift` кодом ниже. В extension — `import PushPlatformExtension`, не `import PushPlatformSDK` (иначе `No such module 'PushPlatformSDK'`). Образец: [NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v1.2.10/Sources/PushPlatformNotificationService/NotificationService.swift).
 
 ```ruby
 target 'PushPlatformNotificationServiceExtension' do
