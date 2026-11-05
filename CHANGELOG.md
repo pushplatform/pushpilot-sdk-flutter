@@ -1,6 +1,6 @@
 # 1.2.12 — 2026-11-05
 
-- Один режим storage: custom `url` не регистрирует development. Зависит от iOS **1.2.11** (sandbox из профиля). Чинит universal badge Increase при локальном API.
+- Один режим storage: custom `url` не регистрирует development (iOS native после `v1.2.11`). Пока pin `PushPlatformSDK` **1.2.10**; серверный coerce уже чинит badge Increase.
 
 # 1.2.11 — 2026-11-04
 
