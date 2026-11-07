@@ -1,15 +1,13 @@
-> Ветка содержит кандидат 2.0.0; он ещё не опубликован. Инструкции для опубликованной 1.x ниже относятся к предыдущей поставке. Для проверки 2.0 используйте path dependency плагина и локальные native SDK той же версии.
-
 # PushPilot Flutter SDK
 
-Плагин `push_platform_flutter` **1.2.11** зависит от опубликованных Android SDK **1.2.5** и CocoaPod `PushPlatformSDK` **1.2.10**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
+Плагин `push_platform_flutter` **2.0.1** зависит от Android SDK **2.0.1** и CocoaPod `PushPlatformSDK` **2.0.1**. Исходники native SDK в pub-пакет не копируются. Доступны регистрация installation, привязка пользователя с metadata, разрешения, токен устройства и отдельные потоки доставки, клика и показа. Dart API и нативные имена `PushPlatform` сохранены.
 
 ## Требования и установка
 
 Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/main/docs/UNIFIED_APPLICATIONS.md).
 
 ```sh
-flutter pub add push_platform_flutter:^1.2.11
+flutter pub add push_platform_flutter:^2.0.1
 ```
 
 Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
@@ -18,20 +16,20 @@ flutter pub add push_platform_flutter:^1.2.11
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: ^1.2.11
+  push_platform_flutter: ^2.0.1
 ```
 
-Приватный Git, соседние checkout и Maven Local не нужны. Нативные зависимости подключает плагин:
+Нативные зависимости подключает плагин:
 
-- Android: `com.pushplatform:sdk-android:1.2.5` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
-- iOS: `PushPlatformSDK` **1.2.10**. Podspec плагина объявляет эту зависимость. Каталога `ios/Bundled` нет. Пока CocoaPods Trunk read-only и не отдаёт 1.2.10, в `ios/Podfile` сразу после `platform :ios` добавьте pin с публичного git-тега:
+- Android: `com.pushplatform:sdk-android:2.0.1` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
+- iOS: `PushPlatformSDK` **2.0.1**. В `ios/Podfile` сразу после `platform :ios` добавьте pin с публичного git-тега:
 
 ```ruby
-pod 'PushPlatformExtension', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v1.2.10'
-pod 'PushPlatformSDK', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v1.2.10'
+pod 'PushPlatformExtension', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v2.0.1'
+pod 'PushPlatformSDK', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v2.0.1'
 ```
 
-Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены. На pub.dev ставьте **1.2.11**.
+Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены.
 
 ## Настройка Android
 
@@ -64,16 +62,16 @@ repositories {
 
 Плагин передаёт APNs callbacks нативному SDK. Токены не нужно получать или отправлять через Dart. ### Подтверждение доставки при закрытом приложении
 
-iOS показывает баннер, не запуская приложение. `received` отправляет `PushPlatformExtension` 1.2.10 (отдельный pod; git-тег, пока Trunk read-only). Плагин target не создаёт. Без него баннер и нажатие остаются.
+iOS показывает баннер, не запуская приложение. `received` отправляет `PushPlatformExtension` 2.0.1 (отдельный pod). Плагин target не создаёт. Без него баннер и нажатие остаются.
 
 1. Откройте `ios/Runner.xcworkspace`. **File → New → Target → Notification Service Extension**. **Don't Activate**. Deployment Target как у Runner, не ниже iOS 13.
 2. Bundle ID extension — bundle ID приложения плюс `.PushPlatformNotificationService`. Для `com.example.app` это `com.example.app.PushPlatformNotificationService`.
 3. **App Groups** на Runner и на extension: `group.com.example.app.pushplatform`.
-4. В Podfile уже должен быть git-pin `v1.2.10` (см. установку). Добавьте target extension и замените `NotificationService.swift` кодом ниже. В extension — `import PushPlatformExtension`, не `import PushPlatformSDK` (иначе `No such module 'PushPlatformSDK'`). Образец: [NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v1.2.10/Sources/PushPlatformNotificationService/NotificationService.swift).
+4. В Podfile уже должен быть git-pin `v2.0.1` (см. установку). Добавьте target extension и замените `NotificationService.swift` кодом ниже. В extension — `import PushPlatformExtension`, не `import PushPlatformSDK` (иначе `No such module 'PushPlatformSDK'`). Образец: [NotificationService.swift](https://github.com/pushplatform/pushpilot-sdk-ios/blob/v2.0.1/Sources/PushPlatformNotificationService/NotificationService.swift).
 
 ```ruby
 target 'PushPlatformNotificationServiceExtension' do
-  pod 'PushPlatformExtension', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v1.2.10'
+  pod 'PushPlatformExtension', :git => 'https://github.com/pushplatform/pushpilot-sdk-ios.git', :tag => 'v2.0.1'
 end
 ```
 
@@ -184,20 +182,20 @@ class _PushDemoState extends State<PushDemo> {
 - Silent push не гарантирует запуск Dart-кода в фоне. Доставка зависит от FCM/APNs, разрешений и ограничений ОС.
 - Android SDK получает текущий FCM-токен при инициализации и регистрирует его на сервере. `getDeviceToken()` и `onPushToken` отдают этот токен в Dart. `getPermissionStatus()` возвращает `granted`, `denied` или `not-determined`.
 - Событие звонка не предоставляет аудиотранспорт или управление разговором. Полноэкранный интерфейс звонка на Android этот Flutter API не настраивает. В 2.0 iOS не создаёт PushKit или CallKit при обычной инициализации. Приложение настраивает нативный CallKit/CallKeep и передаёт VoIP-токен через `PushPlatform.shared.registerVoIPToken`. Альтернатива — `startVoIPNotifications(handler:)`, чей нативный handler немедленно сообщает звонок системному CallKit. `registerForVoIP()` проверяет наличие этой интеграции и возвращает ошибку, если она не настроена. Dart callback не может заменить нативный handler при холодном запуске.
-- Повторные попытки сетевых операций и дедупликация выполняются нативными SDK. Их очереди и кеши имеют ограничения; первоначальная регистрация не получает автоматических повторов на уровне Dart.
-- `debugMode` предназначен для разработки: нативные логи могут содержать пользовательские идентификаторы. Исправление первичной регистрации проверено 16 целевыми native-тестами с Firebase task и MockWebServer; физическая FCM-доставка требует Firebase-конфигурации и контролируемого устройства.
+- Повторные попытки сетевых операций и дедупликация выполняются нативными SDK. Их очереди и кеши имеют ограничения; инициализация и регистрация повторяются нативным SDK после восстановления сети.
+- `debugMode` предназначен для разработки: нативные логи могут содержать пользовательские идентификаторы. Для FCM подключите Firebase-конфигурацию приложения.
 
-[Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/release/flutter-fcm-1.0.2/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
+[Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/main/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
 
 
-### Текущая поставка · 1.2.11
+### Текущая поставка · 2.0.1
 
-`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — опубликованные `sdk-android:1.2.5` и `PushPlatformSDK` 1.2.10.
+`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `url`, `environment`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — `sdk-android:2.0.1` и `PushPlatformSDK` 2.0.1.
 
 Открытие уведомления нативный SDK сообщает сам: при клике, в том числе при холодном старте, он отправляет `PUT /notifications/{id}`; до `initialize` открытие ждёт в очереди. `PushMessage.notificationId` в потоках клика и показа содержит id из ответа `POST /notifications`; поле `notification_id` в `data` не попадает.
 
-### Unified applications · 1.1.0
+### Unified applications
 
-One PushPilot application contains iOS, Android and Web providers. Use the same application ID and permanent application key in SDKs and server code. The key is extractable from the client and allows sending only in that application; it cannot administer the organization or billing. Rotate/revoke it in the console.
+One PushPilot application contains iOS, Android and Web providers. Use the application ID in SDKs. Keep the permanent application key in server code for sending notifications; device registration does not require that key. Rotate or revoke it in the console.
 Omit `environment` during initialization. iOS derives APNs transport from the simulator/build entitlement; Android uses the unified registration scope. The optional legacy argument remains compatible.
 Native SDKs report actual model, OS/SDK/app version, language, time zone, permission and physical/simulator/emulator kind (unknown where unavailable). Test subscription is an independent console marker. Metadata refreshes on foreground and permission changes.

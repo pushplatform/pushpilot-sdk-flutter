@@ -1,5 +1,9 @@
 # 1.2.12 — 2026-11-05
 
+## 2.0.1
+
+Align package/native dependency versions, installation instructions and production integration documentation.
+
 - Один режим storage: custom `url` не регистрирует development (iOS native после `v1.2.11`). Пока pin `PushPlatformSDK` **1.2.10**; серверный coerce уже чинит badge Increase.
 
 # 1.2.11 — 2026-11-04
