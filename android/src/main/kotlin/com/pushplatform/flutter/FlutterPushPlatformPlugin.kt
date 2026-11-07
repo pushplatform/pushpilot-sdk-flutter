@@ -3,6 +3,7 @@ package com.pushplatform.flutter
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap
 /// All business logic, retry, deduplication, and token management happen in the Android SDK.
 ///
 class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandler,
-    PluginRegistry.RequestPermissionsResultListener {
+    PluginRegistry.RequestPermissionsResultListener, PluginRegistry.NewIntentListener {
 
     private lateinit var context: Context
     private lateinit var sdk: PushPlatform
@@ -42,12 +43,18 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
     private lateinit var willDisplayEventChannel: EventChannel
     private lateinit var tokenEventChannel: EventChannel
 
+    private val pendingEvents = mutableMapOf<String, MutableList<Any?>>()
     private var pushEventSink: EventChannel.EventSink? = null
+        set(value) { field = value; if (value != null) flush("push", value) }
     private var callEventSink: EventChannel.EventSink? = null
+        set(value) { field = value; if (value != null) flush("call", value) }
     private var stateEventSink: EventChannel.EventSink? = null
+        set(value) { field = value; if (value != null) flush("state", value) }
     private var openedEventSink: EventChannel.EventSink? = null
+        set(value) { field = value; if (value != null) flush("opened", value) }
     private var willDisplayEventSink: EventChannel.EventSink? = null
     private var tokenEventSink: EventChannel.EventSink? = null
+        set(value) { field = value; if (value != null) flush("token", value) }
     private val pendingDisplays = ConcurrentHashMap<String, NotificationDisplay>()
     @Volatile private var willDisplayObserved = false
 
@@ -97,14 +104,23 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
 
     // ActivityAware
 
+    override fun onNewIntent(intent: Intent): Boolean {
+        val handled = sdk.handleNotificationIntent(intent)
+        if (handled) activity?.intent = intent
+        return handled
+    }
+
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activityBinding = binding
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
+        binding.addOnNewIntentListener(this)
+        sdk.handleNotificationIntent(binding.activity.intent)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
         activityBinding?.removeRequestPermissionsResultListener(this)
+        activityBinding?.removeOnNewIntentListener(this)
         activityBinding = null
         activity = null
     }
@@ -115,6 +131,7 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
 
     override fun onDetachedFromActivity() {
         activityBinding?.removeRequestPermissionsResultListener(this)
+        activityBinding?.removeOnNewIntentListener(this)
         activityBinding = null
         pendingPermissionResult?.error("NO_ACTIVITY", "Activity detached", null)
         pendingPermissionResult = null
@@ -368,24 +385,45 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
 
     // Delegate Implementation
 
+    private fun sink(name: String): EventChannel.EventSink? = when(name) {
+        "push" -> pushEventSink
+        "call" -> callEventSink
+        "state" -> stateEventSink
+        "opened" -> openedEventSink
+        "token" -> tokenEventSink
+        else -> null
+    }
+    private fun emit(name: String, value: Any?) {
+        val target = sink(name)
+        if (target != null) target.success(value)
+        else {
+            val events = pendingEvents.getOrPut(name) { mutableListOf() }
+            if (events.size >= 100) events.removeAt(0)
+            events.add(value)
+        }
+    }
+    private fun flush(name: String, sink: EventChannel.EventSink) {
+        pendingEvents.remove(name).orEmpty().forEach { sink.success(it) }
+    }
+
     private class DelegateImpl(private val plugin: FlutterPushPlatformPlugin) : PushPlatformDelegate {
         override fun didInitialize(installationId: String) {
-            plugin.mainHandler.post { plugin.stateEventSink?.success("initialized") }
+            plugin.mainHandler.post { plugin.emit("state", "initialized") }
         }
 
         override fun didUpdateFcmToken() {
             plugin.mainHandler.post {
-                plugin.stateEventSink?.success("registered")
-                plugin.sdk.getDeviceToken()?.let { plugin.tokenEventSink?.success(it) }
+                plugin.emit("state", "registered")
+                plugin.sdk.getDeviceToken()?.let { plugin.emit("token", it) }
             }
         }
 
         override fun didUpdateDeviceToken(token: String) {
-            plugin.mainHandler.post { plugin.tokenEventSink?.success(token) }
+            plugin.mainHandler.post { plugin.emit("token", token) }
         }
 
         override fun notificationWillDisplay(event: NotificationDisplay) {
-            if (!plugin.willDisplayObserved) return
+            if (!plugin.willDisplayObserved || plugin.willDisplayEventSink == null) return
             val id = UUID.randomUUID().toString()
             plugin.pendingDisplays[id] = event
             event.deferDecision()
@@ -399,33 +437,27 @@ class FlutterPushPlatformPlugin : FlutterPlugin, ActivityAware, MethodChannel.Me
 
         override fun didOpenNotification(notification: ParsedNotification) {
             plugin.mainHandler.post {
-                plugin.openedEventSink?.success(plugin.serializeNotification(notification))
+                plugin.emit("opened", plugin.serializeNotification(notification))
             }
         }
 
         override fun didFailToRegisterFcmToken(error: SdkError) {
-            plugin.mainHandler.post { plugin.stateEventSink?.success("error") }
+            plugin.mainHandler.post { plugin.emit("state", "error") }
         }
 
         override fun didReceiveNotification(notification: ParsedNotification, isInForeground: Boolean) {
             plugin.mainHandler.post {
-                // Check if this is a call notification (high-priority)
-                if (notification.callId != null) {
-                    val payload = plugin.serializeCallInfo(notification)
-                    plugin.callEventSink?.success(payload)
-                } else {
-                    val payload = plugin.serializeNotification(notification)
-                    plugin.pushEventSink?.success(payload)
-                }
+                plugin.emit("push", plugin.serializeNotification(notification))
+                if (notification.callId != null) plugin.emit("call", plugin.serializeCallInfo(notification))
             }
         }
 
         override fun onNotificationPermissionResult(granted: Boolean) {
             plugin.mainHandler.post {
                 if (granted) {
-                    plugin.stateEventSink?.success("permissionsGranted")
+                    plugin.emit("state", "permissionsGranted")
                 } else {
-                    plugin.stateEventSink?.success("permissionsDenied")
+                    plugin.emit("state", "permissionsDenied")
                 }
                 plugin.pendingPermissionResult?.success(granted)
                 plugin.pendingPermissionResult = null

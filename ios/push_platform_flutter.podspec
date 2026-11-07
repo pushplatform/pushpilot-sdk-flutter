@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'push_platform_flutter'
-  s.version          = '1.2.12'
+  s.version          = '2.0.0'
   s.summary          = 'PushPilot Flutter SDK'
   s.description      = <<-DESC
 Flutter plugin for Push Platform - a thin wrapper over native iOS SDK.
@@ -11,7 +11,7 @@ Provides type-safe Dart API for push notifications, VoIP calls, and user managem
   s.author           = 'PushPilot contributors'
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
-  s.dependency 'PushPlatformSDK', '1.2.10'
+  s.dependency 'PushPlatformSDK', '2.0.0'
   s.frameworks       = 'Foundation', 'UIKit', 'UserNotifications', 'PushKit', 'CallKit', 'AVFoundation', 'Network', 'Security'
 
   s.ios.deployment_target = '13.0'

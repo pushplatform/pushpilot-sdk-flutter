@@ -16,14 +16,43 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
     private var voipEventChannel: FlutterEventChannel!
     private var stateEventChannel: FlutterEventChannel!
 
-    fileprivate var pushEventSink: FlutterEventSink?
-    fileprivate var voipEventSink: FlutterEventSink?
-    fileprivate var stateEventSink: FlutterEventSink?
-    fileprivate var openedEventSink: FlutterEventSink?
+    fileprivate var pushEventSink: FlutterEventSink? { didSet { flush("push", sink: pushEventSink) } }
+    fileprivate var voipEventSink: FlutterEventSink? { didSet { flush("voip", sink: voipEventSink) } }
+    fileprivate var stateEventSink: FlutterEventSink? { didSet { flush("state", sink: stateEventSink) } }
+    fileprivate var openedEventSink: FlutterEventSink? { didSet { flush("opened", sink: openedEventSink) } }
     fileprivate var willDisplayEventSink: FlutterEventSink?
-    fileprivate var tokenEventSink: FlutterEventSink?
+    fileprivate var tokenEventSink: FlutterEventSink? { didSet { flush("token", sink: tokenEventSink) } }
     fileprivate var willDisplayObserved = false
+    private var pendingEvents: [String: [Any]] = [:]
     private var pendingDisplays: [String: NotificationDisplayEvent] = [:]
+
+    private func sink(_ name: String) -> FlutterEventSink? {
+        switch name {
+        case "push": return pushEventSink
+        case "voip": return voipEventSink
+        case "state": return stateEventSink
+        case "opened": return openedEventSink
+        case "token": return tokenEventSink
+        default: return nil
+        }
+    }
+    private func emit(_ name: String, _ value: Any) {
+        let work = {
+            if let sink = self.sink(name) { sink(value) }
+            else {
+                var values = self.pendingEvents[name] ?? []
+                if values.count >= 100 { values.removeFirst() }
+                values.append(value)
+                self.pendingEvents[name] = values
+            }
+        }
+        if Thread.isMainThread { work() } else { DispatchQueue.main.async(execute: work) }
+    }
+    private func flush(_ name: String, sink: FlutterEventSink?) {
+        guard let sink else { return }
+        let values = pendingEvents.removeValue(forKey: name) ?? []
+        values.forEach { sink($0) }
+    }
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let methodChannel = FlutterMethodChannel(
@@ -128,9 +157,14 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
             }
         }
 
-        // Note: VoIP registration happens automatically after configure()
-        // PushKitManager is initialized in PushPlatform init and registers immediately
+        // Ordinary initialization does not create a PushKit registry or CallKit provider.
 
+    }
+
+    public func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Bool {
+        let handled = PushPlatform.shared.handleBackgroundNotification(userInfo)
+        if handled { completionHandler(.newData) }
+        return handled
     }
 
     public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -282,9 +316,10 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
     }
 
     private func handleRegisterVoIP(result: @escaping FlutterResult) {
-        // VoIP registration happens automatically in SDK init
-        // PushKitManager registers for VoIP push immediately upon creation
-        // This method is a no-op, but kept for API compatibility
+        guard sdk?.isVoIPConfigured == true else {
+            result(FlutterError(code: "NATIVE_VOIP_REQUIRED", message: "Configure a native PushKit/CallKit handler during application launch, or register the token from your existing registry.", details: nil))
+            return
+        }
         result(nil)
     }
 
@@ -397,29 +432,29 @@ public class FlutterPushPlatformPlugin: NSObject, FlutterPlugin {
 
 extension FlutterPushPlatformPlugin: PushPlatformDelegate {
     public func didInitialize(installationID: UUID) {
-        stateEventSink?("initialized")
+        emit("state", "initialized")
     }
 
     public func didRegisterTokens() {
-        stateEventSink?("registered")
+        emit("state", "registered")
     }
 
     public func didFailRegisterTokens(error: SDKError) {
         // Report error via state channel
-        stateEventSink?("error")
+        emit("state", "error")
     }
 
     public func didReceiveNotification(_ notification: ParsedNotification, context: NotificationContext) {
         let payload = serializeNotification(notification)
-        pushEventSink?(payload)
+        emit("push", payload)
     }
 
     public func didOpenNotification(_ notification: ParsedNotification, action: String?, context: NotificationContext) {
-        openedEventSink?(serializeNotification(notification))
+        emit("opened", serializeNotification(notification))
     }
 
     public func notificationWillDisplay(_ event: NotificationDisplayEvent) {
-        guard willDisplayObserved else { return }
+        guard willDisplayObserved, willDisplayEventSink != nil else { return }
         let displayId = UUID().uuidString
         pendingDisplays[displayId] = event
         event.deferDecision()
@@ -430,19 +465,19 @@ extension FlutterPushPlatformPlugin: PushPlatformDelegate {
     }
 
     public func didUpdateDeviceToken(_ token: String) {
-        tokenEventSink?(token)
+        emit("token", token)
     }
 
     public func didReceiveIncomingCall(callID: String, callerName: String, metadata: [String: Any]) {
         let payload = serializeCallInfo(callID: callID, callerName: callerName, metadata: metadata)
-        voipEventSink?(payload)
+        emit("voip", payload)
     }
 
     // SECURITY: Token methods are NEVER exposed to Dart
     // Token registration happens entirely in the native SDK
     public func didUpdateAPNsToken() {
         if let token = sdk?.getDeviceToken() {
-            tokenEventSink?(token)
+            emit("token", token)
         }
     }
 
