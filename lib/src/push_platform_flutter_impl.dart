@@ -208,6 +208,7 @@ class PushPlatformFlutter {
 
   Stream<NotificationDisplayEvent> get onNotificationWillDisplay {
     _displayController ??= StreamController<NotificationDisplayEvent>.broadcast(
+      sync: true,
       onListen: () {
         _displaySource = _willDisplayEventChannel.receiveBroadcastStream().listen((event) {
           final payload = Map<String, dynamic>.from(event as Map);
