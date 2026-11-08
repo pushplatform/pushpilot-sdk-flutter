@@ -1,6 +1,6 @@
 name: push_platform_flutter
 description: PushPilot Flutter SDK for Android and iOS push notifications, installation registration, user association, and native call events.
-version: 2.0.3
+version: 2.0.4
 homepage: https://github.com/pushplatform/pushpilot-sdk-flutter
 repository: https://github.com/pushplatform/pushpilot-sdk-flutter
 issue_tracker: https://github.com/pushplatform/pushpilot-sdk-flutter/issues
