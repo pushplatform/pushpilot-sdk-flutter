@@ -65,7 +65,7 @@ repositories {
 ## Настройка iOS
 
 1. Укажите `platform :ios, '13.0'` или выше в `ios/Podfile` и тот же deployment target у Runner. Если Podfile ещё нет, создайте стандартный Flutter Podfile для CocoaPods. Swift Package Manager для этого Flutter-плагина не реализован.
-2. Выполните `cd ios` и `pod install`; затем откройте `Runner.xcworkspace`.
+2. Выполните `cd ios` и `pod install --repo-update`; затем откройте `Runner.xcworkspace`.
 3. Для реальных уведомлений включите **Push Notifications** у Bundle ID и в Xcode Signing & Capabilities. На сервере PushPilot настройте APNs provider для того же Bundle ID и окружения. APNs ключи остаются на сервере.
 4. `AppDelegate` должен наследовать `FlutterAppDelegate` и передавать ему lifecycle callbacks через `super`. Назначьте `UNUserNotificationCenter.current().delegate = self` в `application(_:didFinishLaunchingWithOptions:)`, чтобы Flutter передавал foreground-уведомления и нажатия плагину. Если у вас свой delegate уведомлений, явно согласуйте маршрутизацию с Flutter.
 5. Для silent push включите **Background Modes → Remote notifications**; отдельную нативную обработку фонового обновления реализует приложение. Для VoIP включите **Background Modes → Voice over IP** и настройте VoIP topic на сервере.
@@ -201,6 +201,8 @@ class _PushDemoState extends State<PushDemo> {
 
 
 ### Текущая поставка · 2.0.4
+
+Обновление: `flutter pub upgrade push_platform_flutter`, затем в `ios` — `pod update push_platform_flutter PushPlatformSDK PushPlatformExtension --repo-update`. Сохраняйте Podfile.lock и пересоберите приложение.
 
 `initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — `sdk-android:2.0.3` и `PushPlatformSDK` 2.0.3.
 
