@@ -70,7 +70,7 @@ This guide covers common issues, their causes, and solutions for the Push Platfo
    **Check**: Verify push payload sent to correct topic
 
    **Expected**: `<bundle_id>.voip` (e.g., `com.example.app.voip`)
-   
+
    **Fix**: Update backend to use `.voip` suffix for VoIP push
 
 4. **VoIP Registration Not Automatic**
@@ -128,7 +128,7 @@ This guide covers common issues, their causes, and solutions for the Push Platfo
    ```bash
    # Simulator
    xcrun simctl erase all
-   
+
    # Device: Settings → General → Reset → Reset Location & Privacy
    ```
 
@@ -416,7 +416,10 @@ This guide covers common issues, their causes, and solutions for the Push Platfo
 await sdk.login(userId: 'user-123'); // Throws NOT_INITIALIZED
 
 // CORRECT
-await sdk.initialize(apiKey: 'key', environment: 'production');
+await sdk.initialize(InitializeOptions(
+  applicationId: 'YOUR_APPLICATION_UUID',
+  debugMode: false,
+));
 await sdk.login(userId: 'user-123');
 ```
 
@@ -427,11 +430,10 @@ await sdk.login(userId: 'user-123');
 **Fix**:
 ```dart
 // Check all required parameters
-await sdk.initialize(
-  apiKey: 'your-api-key',     // Required, non-empty
-  environment: 'production',   // Required: 'production', 'development', or 'sandbox'
-  debugMode: true,             // Optional, defaults to false
-);
+await sdk.initialize(InitializeOptions(
+  applicationId: 'YOUR_APPLICATION_UUID',
+  debugMode: true,
+));
 ```
 
 #### `NETWORK_ERROR`
@@ -440,17 +442,17 @@ await sdk.initialize(
 
 **Fix**:
 1. Check internet connectivity
-2. Verify `url` is correct
+2. Verify the PushPilot application UUID and network connectivity
 3. Check firewall/proxy settings
 4. Retry with exponential backoff:
 ```dart
 Future<void> initializeWithRetry({int maxAttempts = 3}) async {
   for (var i = 0; i < maxAttempts; i++) {
     try {
-      await sdk.initialize(
-        apiKey: apiKey,
-        environment: environment,
-      );
+      await sdk.initialize(InitializeOptions(
+        applicationId: 'YOUR_APPLICATION_UUID',
+        debugMode: false,
+      ));
       return;
     } on PlatformException catch (e) {
       if (e.code == 'NETWORK_ERROR' && i < maxAttempts - 1) {
@@ -512,7 +514,7 @@ Future<void> initializeWithRetry({int maxAttempts = 3}) async {
    ```dart
    class _MyWidgetState extends State<MyWidget> {
      StreamSubscription? _subscription;
-     
+
      @override
      void initState() {
        super.initState();
@@ -520,7 +522,7 @@ Future<void> initializeWithRetry({int maxAttempts = 3}) async {
          // Handle message
        });
      }
-     
+
      @override
      void dispose() {
        _subscription?.cancel();
@@ -601,11 +603,7 @@ if (Platform.isIOS) {
 
 2. **Invalid Podfile Path**
 
-   **Fix**: Update Podfile:
-   ```ruby
-   # ios/Podfile
-   pod 'PushPlatformSDK', :path => '../pushpilot-sdk-ios'
-   ```
+   **Fix**: Keep the standard Flutter Podfile and install pods from `ios/`. The Flutter plugin supplies the native SDK dependency; an additional app-level pod entry is unnecessary.
 
 3. **CocoaPods Cache Corruption**
 
@@ -735,11 +733,10 @@ if (Platform.isIOS) {
 
    **Fix**: Disable debug mode:
    ```dart
-   await sdk.initialize(
-     apiKey: apiKey,
-     environment: 'production',
-     debugMode: false, // Disable in production
-   );
+   await sdk.initialize(InitializeOptions(
+     applicationId: 'YOUR_APPLICATION_UUID',
+     debugMode: false,
+   ));
    ```
 
 2. **Too Many Stream Listeners**
@@ -748,7 +745,7 @@ if (Platform.isIOS) {
    ```dart
    // Create broadcast stream
    final _pushController = StreamController<PushMessage>.broadcast();
-   
+
    void initState() {
      super.initState();
      // Single subscription to SDK
@@ -756,7 +753,7 @@ if (Platform.isIOS) {
        _pushController.add(msg);
      });
    }
-   
+
    // Multiple widgets can listen to broadcast
    _pushController.stream.listen((msg) {
      // Handle in widget 1
@@ -773,11 +770,10 @@ if (Platform.isIOS) {
 ### Enable Debug Logging
 
 ```dart
-await PushPlatformFlutter.instance.initialize(
-  apiKey: 'your-key',
-  environment: 'development',
-  debugMode: true, // Enable verbose logging
-);
+await PushPlatformFlutter.instance.initialize(InitializeOptions(
+  applicationId: 'YOUR_APPLICATION_UUID',
+  debugMode: true,
+));
 ```
 
 ### iOS Console Logs
