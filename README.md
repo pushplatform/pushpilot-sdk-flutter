@@ -200,7 +200,7 @@ class _PushDemoState extends State<PushDemo> {
 [Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/main/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
 
 
-### Текущая поставка · 2.0.1
+### Текущая поставка · 2.0.2
 
 `initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — `sdk-android:2.0.1` и `PushPlatformSDK` 2.0.1.
 
