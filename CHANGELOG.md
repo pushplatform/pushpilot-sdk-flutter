@@ -8,11 +8,11 @@ Align package/native dependency versions, installation instructions and producti
 
 # 1.2.11 — 2026-11-04
 
-- iOS: `PushPlatformSDK` **1.2.10** + отдельный pod `PushPlatformExtension`. NSE: `pod 'PushPlatformExtension'` (не subspec). В Podfile pin обеих строк с git-тега `v1.2.10` (Trunk read-only). Android — `sdk-android` 1.2.5.
+- iOS: `PushPlatformSDK` **1.2.10** + отдельный pod `PushPlatformExtension`. NSE: `PushPlatformExtension` (не subspec). В Podfile pin обеих строк с git-тега `v1.2.10` (Trunk read-only). Android — `sdk-android` 1.2.5.
 
 # 1.2.10 — 2026-11-04
 
-- NSE: `pod 'PushPlatformSDK/Extension'` + `import PushPlatformExtension` (iOS SDK 1.2.9).
+- NSE: `PushPlatformSDK/Extension` + `import PushPlatformExtension` (iOS SDK 1.2.9).
 - Документация и NSE: `PushPlatformSDK` 1.2.9 резолвится с публичного git-тега `v1.2.9` (CocoaPods Trunk read-only). Podspec по-прежнему `s.dependency 'PushPlatformSDK', '1.2.9'`. Android — `sdk-android` 1.2.5.
 
 # 1.2.9 — 2026-11-04
@@ -64,7 +64,7 @@ Align package/native dependency versions, installation instructions and producti
 
 # 1.2.0 — 2026-11-01
 
-- `initialize` takes an application id or `{applicationId, url, environment}`. No API key is sent.
+- `initialize` takes an application id or `{applicationId, environment}`. No API key is sent.
 - The plugin depends on the published iOS and Android SDKs.
 
 # 1.1.1 — 2026-11-01

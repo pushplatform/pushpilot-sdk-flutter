@@ -171,14 +171,14 @@ The Push Platform Flutter SDK is a **thin wrapper** over native iOS and Android 
 ```
 Flutter App
     │
-    │ initialize(apiKey, environment)
+    │ initialize(applicationId, debugMode)
     ▼
 MethodChannel
     │
     ├─ iOS: handle("initialize")
     │       │
     │       ▼
-    │   PushPlatform.shared.configure(apiKey, environment)
+    │   PushPlatform.shared.initialize(applicationId)
     │       │
     │       ├─ Register APNs
     │       ├─ Register PushKit (VoIP)
@@ -189,7 +189,7 @@ MethodChannel
     └─ Android: onMethodCall("initialize")
             │
             ▼
-        PushPlatform.getInstance().configure(context, apiKey, environment)
+        PushPlatform.getInstance().initialize(context, applicationId)
             │
             ├─ Initialize FCM
             ├─ Store credentials in EncryptedSharedPreferences
@@ -314,7 +314,7 @@ Flutter App
 
 | Method | Arguments | Returns | Errors |
 |--------|-----------|---------|--------|
-| `initialize` | `{applicationId, url?, environment, debugMode}` | `null` | `NOT_INITIALIZED`, `INVALID_ARGUMENTS` |
+| `initialize` | `{applicationId, debugMode}` | `null` | `NOT_INITIALIZED`, `INVALID_ARGUMENTS` |
 | `requestPermissions` | `null` | `bool` | `PERMISSION_DENIED` |
 | `login` | `{userId, metadata?}` | `String?` (deviceId) | `NOT_INITIALIZED`, `INVALID_ARGUMENTS`, `NETWORK_ERROR` |
 | `logout` | `null` | `null` | `NOT_INITIALIZED` |

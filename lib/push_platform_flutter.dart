@@ -10,11 +10,10 @@
 /// import 'package:push_platform_flutter/push_platform_flutter.dart';
 ///
 /// // Initialize
-/// await PushPlatformFlutter.instance.initialize({
-///   'applicationId': '11111111-1111-1111-1111-111111111111',
-///   'url': 'https://api.your-company.example',
-///   'environment': 'production',
-/// });
+/// await PushPlatformFlutter.instance.initialize(InitializeOptions(
+///   applicationId: 'YOUR_APPLICATION_UUID',
+///   debugMode: false,
+/// ));
 ///
 /// // Request permissions
 /// final granted = await PushPlatformFlutter.instance.requestPermissions();
