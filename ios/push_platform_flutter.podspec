@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'push_platform_flutter'
-  s.version          = '2.0.4'
+  s.version          = '2.0.5'
   s.summary          = 'PushPilot Flutter SDK'
   s.description      = <<-DESC
 Flutter plugin for Push Platform - a thin wrapper over native iOS SDK.

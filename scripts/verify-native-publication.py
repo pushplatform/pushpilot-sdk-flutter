@@ -8,7 +8,7 @@ podspec = read('ios/push_platform_flutter.podspec')
 assert re.search(r"s\.version\s*=\s*'([^']+)'", podspec)[1] == version, 'Flutter/pod versions differ'
 assert re.search(r'^version = "([^"]+)"', read('android/build.gradle.kts'), re.M)[1] == version, 'Flutter/Gradle versions differ'
 ios = re.search(r"s\.dependency 'PushPlatformSDK', '([^']+)'", podspec)[1]
-android = re.search(r'com.pushplatform:sdk-android:([^"\s]+)', read('android/build.gradle.kts'))[1]
+android = re.search(r'ru.pushplatform:sdk-android:([^"\s]+)', read('android/build.gradle.kts'))[1]
 def get(url):
     return subprocess.check_output(['curl', '--fail', '--location', '--silent', '--show-error', '--retry', '3', '--max-time', '60', url])
 for name in ['PushPlatformExtension', 'PushPlatformSDK']:
@@ -21,9 +21,9 @@ for name in ['PushPlatformExtension', 'PushPlatformSDK']:
     assert spec['source'] == {'git': 'https://github.com/pushplatform/pushpilot-sdk-ios.git', 'tag': 'v' + ios}, 'Unexpected pod source'
     if name == 'PushPlatformSDK':
         assert spec['dependencies']['PushPlatformExtension'] == [ios], 'SDK/Extension versions differ'
-base = f'https://raw.githubusercontent.com/pushplatform/pushpilot-sdk-android/maven/com/pushplatform/sdk-android/{android}/sdk-android-{android}'
+base = f'https://raw.githubusercontent.com/pushplatform/pushpilot-sdk-android/maven/ru/pushplatform/sdk-android/{android}/sdk-android-{android}'
 module = json.loads(get(base + '.module'))
-assert module['component']['group'] == 'com.pushplatform' and module['component']['module'] == 'sdk-android' and module['component']['version'] == android, 'Wrong Maven coordinate'
+assert module['component']['group'] == 'ru.pushplatform' and module['component']['module'] == 'sdk-android' and module['component']['version'] == android, 'Wrong Maven coordinate'
 aar = get(base + '.aar')
 assert hashlib.sha256(aar).hexdigest() == get(base + '.aar.sha256').decode().strip(), 'AAR checksum differs'
 files = [f for variant in module['variants'] for f in variant.get('files', []) if f['name'].endswith('.aar')]
