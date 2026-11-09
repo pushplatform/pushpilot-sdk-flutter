@@ -21,18 +21,19 @@ await sdk.initialize('YOUR_APPLICATION_UUID');
 
 Flutter 3.24+, Dart 3.5+, Android API 21+ или iOS 13+. Для сборки Android нужен JDK 17, Kotlin Gradle plugin 2.0+ и установленный Android SDK; для iOS — macOS, Xcode и CocoaPods. Состав поставки и процедура обновления описаны в [документации релиза](https://github.com/pushplatform/pushpilot-sdk-flutter/blob/main/docs/UNIFIED_APPLICATIONS.md).
 
-```sh
-flutter pub add push_platform_flutter
-```
-
-Либо добавьте в `pubspec.yaml` и выполните `flutter pub get`:
+Добавьте GitHub-релиз в `pubspec.yaml`:
 
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
-  push_platform_flutter: '>=2.0.0 <3.0.0'
+  push_platform_flutter:
+    git:
+      url: https://github.com/pushplatform/pushpilot-sdk-flutter.git
+      ref: v2.0.5
 ```
+
+Затем выполните `flutter pub get`.
 
 Нативные зависимости подключает плагин:
 
