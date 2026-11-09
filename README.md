@@ -36,7 +36,7 @@ dependencies:
 
 Нативные зависимости подключает плагин:
 
-- Android: `com.pushplatform:sdk-android` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
+- Android: `ru.pushplatform:sdk-android` из [публичного Maven-репозитория](https://github.com/pushplatform/pushpilot-sdk-android/tree/maven), **не из Maven Central**. AndroidX, Firebase Messaging и OkHttp разрешаются транзитивно.
 
 
 Dart-import `package:push_platform_flutter/push_platform_flutter.dart`, публичный API, имя модуля плагина `push_platform_flutter` и нативные типы `PushPlatform` сохранены.
@@ -51,7 +51,7 @@ repositories {
     mavenCentral()
     maven {
         url = uri("https://raw.githubusercontent.com/pushplatform/pushpilot-sdk-android/maven/")
-        content { includeModule("com.pushplatform", "sdk-android") }
+        content { includeModule("ru.pushplatform", "sdk-android") }
     }
 }
 ```
@@ -200,11 +200,11 @@ class _PushDemoState extends State<PushDemo> {
 [Пример](https://github.com/pushplatform/pushpilot-sdk-flutter/tree/main/example), [исходники](https://github.com/pushplatform/pushpilot-sdk-flutter), [Issues](https://github.com/pushplatform/pushpilot-sdk-flutter/issues). Лицензия — MIT.
 
 
-### Текущая поставка · 2.0.4
+### Текущая поставка · 2.0.5
 
 Обновление: `flutter pub upgrade push_platform_flutter`, затем в `ios` — `pod update push_platform_flutter PushPlatformSDK PushPlatformExtension --repo-update`. Сохраняйте Podfile.lock и пересоберите приложение.
 
-`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — `sdk-android:2.0.3` и `PushPlatformSDK` 2.0.3.
+`initialize` принимает application id, `InitializeOptions` или map с `applicationId`, `debugMode` и необязательным `foregroundBannerFallback`. Секретный ключ не нужен. Нативные зависимости — `ru.pushplatform:sdk-android:2.0.4` и `PushPlatformSDK` 2.0.3.
 
 Открытие уведомления нативный SDK сообщает сам: при клике, в том числе при холодном старте, он отправляет `PUT /notifications/{id}`; до `initialize` открытие ждёт в очереди. `PushMessage.notificationId` в потоках клика и показа содержит id из ответа `POST /notifications`; поле `notification_id` в `data` не попадает.
 

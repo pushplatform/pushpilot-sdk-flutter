@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pushplatform.flutter"
-version = "2.0.4"
+version = "2.0.5"
 
 repositories {
     google()
@@ -16,7 +16,7 @@ rootProject.allprojects {
     repositories {
         maven {
             url = uri("https://raw.githubusercontent.com/pushplatform/pushpilot-sdk-android/maven/")
-            content { includeModule("com.pushplatform", "sdk-android") }
+            content { includeModule("ru.pushplatform", "sdk-android") }
         }
     }
 }
@@ -43,7 +43,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("com.pushplatform:sdk-android:2.0.3")
+    implementation("ru.pushplatform:sdk-android:2.0.4")
 
     // Test dependencies
     testImplementation("junit:junit:4.13.2")

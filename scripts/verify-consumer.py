@@ -32,8 +32,8 @@ if args.platform == 'ios':
         assert any(name in names for repo, names in lock['SPEC REPOS'].items() if repo in ['trunk', 'https://cdn.cocoapods.org/']), 'Native SDK must resolve from public CocoaPods'
 else:
     run('flutter', 'build', 'apk', '--debug')
-    result = subprocess.check_output(['./gradlew', ':app:dependencyInsight', '--dependency', 'com.pushplatform:sdk-android', '--configuration', 'debugRuntimeClasspath', '--console=plain'], cwd=consumer / 'android', text=True)
-    native = re.search(r'com.pushplatform:sdk-android:([^"\s]+)', (root / 'android/build.gradle.kts').read_text())[1]
-    assert f'com.pushplatform:sdk-android:{native}' in result, 'Wrong Maven version'
+    result = subprocess.check_output(['./gradlew', ':app:dependencyInsight', '--dependency', 'ru.pushplatform:sdk-android', '--configuration', 'debugRuntimeClasspath', '--console=plain'], cwd=consumer / 'android', text=True)
+    native = re.search(r'ru.pushplatform:sdk-android:([^"\s]+)', (root / 'android/build.gradle.kts').read_text())[1]
+    assert f'ru.pushplatform:sdk-android:{native}' in result, 'Wrong Maven version'
     print(result)
 print(f'Consumer build passed: Flutter {version}, {args.platform}, published={args.published}')

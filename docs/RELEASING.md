@@ -1,12 +1,12 @@
-# Выпуск SDK 2.0.4
+# Выпуск SDK 2.0.5
 
 Версия плагина должна совпадать в pubspec.yaml, Android Gradle и iOS podspec. Нативные зависимости имеют собственные версии.
 Инструкции установки и настройки приложения находятся в README.md;
 изменения интеграции звонков — в docs/MIGRATION_2.md.
 
-1. Согласуйте pubspec.yaml, Android Gradle и iOS podspec: версия плагина 2.0.4, нативные зависимости — 2.0.3.
+1. Согласуйте pubspec.yaml, Android Gradle и iOS podspec: версия плагина 2.0.5, Android SDK — 2.0.4, iOS SDK — 2.0.3.
 2. Выполните `flutter pub get`, `flutter analyze` и `flutter test`.
-3. Соберите Android и iOS приложения с подключённым плагином и нативными SDK 2.0.3.
+3. Соберите Android и iOS приложения с подключённым плагином и Android SDK 2.0.4 и iOS SDK 2.0.3.
 4. Проверьте `flutter pub publish --dry-run` и содержимое архива.
 5. Workflow `flutter-sdk-release` запускается вручную; параметр `publish` управляет публикацией в pub.dev.
 
